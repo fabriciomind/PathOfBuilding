@@ -3,27 +3,38 @@
 -- Module: Mod List
 -- Stores modifiers in a flat list
 --
-local launch, main = ...
-
+local ipairs = ipairs
 local pairs = pairs
+local select = select
 local t_insert = table.insert
 local m_floor = math.floor
-local m_abs = math.abs
+local m_min = math.min
+local m_max = math.max
+local m_modf = math.modf
 local band = bit.band
 local bor = bit.bor
 
 local mod_createMod = modLib.createMod
 
-local hack = { }
-
-local ModListClass = common.NewClass("ModList", function(self)
-	self.multipliers = { }
-	self.conditions = { }
-	self.stats = { }
+local ModListClass = newClass("ModList", "ModStore", function(self, parent)
+	self.ModStore(parent)
 end)
 
 function ModListClass:AddMod(mod)
 	t_insert(self, mod)
+end
+
+function ModListClass:MergeMod(mod)
+	if mod.type == "BASE" or mod.type == "INC" then
+		for i = 1, #self do
+			if modLib.compareModParams(self[i], mod) then
+				self[i] = copyTable(self[i], true)
+				self[i].value = self[i].value + mod.value
+				return
+			end
+		end
+	end
+	self:AddMod(mod)
 end
 
 function ModListClass:AddList(modList)
@@ -32,176 +43,140 @@ function ModListClass:AddList(modList)
 	end
 end
 
-function ModListClass:CopyList(modList)
-	for i = 1, #modList do
-		self:AddMod(copyTable(modList[i]))
-	end
+function ModListClass:MergeNewMod(...)
+	self:MergeMod(mod_createMod(...))
 end
 
-function ModListClass:ScaleAddList(modList, scale)
-	for i = 1, #modList do
-		local scaledMod = copyTable(modList[i])
-		if type(scaledMod.value) == "number" then
-			scaledMod.value = (m_floor(scaledMod.value) == scaledMod.value) and m_floor(scaledMod.value * scale) or scaledMod.value * scale
-		end
-		self:AddMod(scaledMod)
-	end
-end
 
-function ModListClass:NewMod(...)
-	self:AddMod(mod_createMod(...))
-end
-
-function ModListClass:Sum(modType, cfg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
-	local flags, keywordFlags = 0, 0
-	local skillName, skillGem, skillPart, skillTypes, slotName, source, tabulate
-	if cfg then
-		flags = cfg.flags or 0
-		keywordFlags = cfg.keywordFlags or 0
-		skillName = cfg.skillName
-		skillGem = cfg.skillGem
-		skillPart = cfg.skillPart
-		skillTypes = cfg.skillTypes
-		slotName = cfg.slotName
-		source = cfg.source
-		tabulate = cfg.tabulate
-	end
-	local result
-	local nullValue = 0
-	if tabulate or modType == "LIST" then
-		result = { }
-		nullValue = nil
-	elseif modType == "MORE" then
-		result = 1
-	elseif modType == "FLAG" then
-		result = false
-		nullValue = false
-	else
-		result = 0
-	end
-	hack[1] = arg1
-	if arg1 then
-		hack[2] = arg2
-		if arg2 then
-			hack[3] = arg3
-			if arg3 then
-				hack[4] = arg4
-				if arg4 then
-					hack[5] = arg5
-					if arg5 then
-						hack[6] = arg6
-						if arg6 then
-							hack[7] = arg7
-							if arg7 then
-								hack[8] = arg8
-								if arg8 then
-									hack[9] = arg9
-									if arg9 then
-										hack[10] = arg10
-										if arg10 then
-											hack[11] = arg11
-											if arg11 then
-												hack[12] = arg12
-											end
-										end
-									end
-								end
-							end
-						end
-					end
+function ModListClass:SumInternal(context, modType, cfg, flags, keywordFlags, source, ...)
+	local result = 0
+	for i = 1, select('#', ...) do
+		local modName = select(i, ...)
+		for i = 1, #self do
+			local mod = self[i]
+			if mod.name == modName and mod.type == modType and band(flags, mod.flags) == mod.flags and (mod.keywordFlags == 0 or band(keywordFlags, mod.keywordFlags) ~= 0) and (not source or mod.source:match("[^:]+") == source) then
+				if mod[1] then
+					result = result + (context:EvalMod(mod, cfg) or 0)
+				else
+					result = result + mod.value
 				end
 			end
 		end
 	end
-	for i = 1, #hack do --i = 1, select('#', ...) do
-		local modName = hack[i]--select(i, ...)
+	if self.parent then
+		result = result + self.parent:SumInternal(context, modType, cfg, flags, keywordFlags, source, ...)
+	end
+	return result
+end
+
+function ModListClass:MoreInternal(context, cfg, flags, keywordFlags, source, ...)
+	local result = 1
+	for i = 1, select('#', ...) do
+		local modName = select(i, ...)
 		for i = 1, #self do
 			local mod = self[i]
-			if mod.name == modName and (not modType or mod.type == modType) and band(flags, mod.flags) == mod.flags and (mod.keywordFlags == 0 or band(keywordFlags, mod.keywordFlags) ~= 0) and (not source or mod.source:match("[^:]+") == source) then
-				local value = mod.value
-				for _, tag in pairs(mod.tagList) do
-					if tag.type == "Multiplier" then
-						local mult = (self.multipliers[tag.var] or 0)
-						if type(value) == "table" then
-							value = copyTable(value)
-							value.value = value.value * mult + (tag.base or 0)
-						else
-							value = value * mult + (tag.base or 0)
-						end
-					elseif tag.type == "PerStat" then
-						local mult = m_floor((self.stats[tag.stat] or 0) / tag.div + 0.0001)
-						if type(value) == "table" then
-							value = copyTable(value)
-							value.value = value.value * mult + (tag.base or 0)
-						else
-							value = value * mult + (tag.base or 0)
-						end
-					elseif tag.type == "Condition" then
-						local match = false
-						if tag.varList then
-							for _, var in pairs(tag.varList) do
-								if self.conditions[var] then
-									match = true
-									break
-								end
-							end
-						else
-							match = self.conditions[tag.var]
-						end
-						if tag.neg then
-							match = not match
-						end
-						if not match then
-							value = nullValue
-							break
-						end
-					elseif tag.type == "SocketedIn" then
-						if tag.slotName ~= slotName or (tag.keyword and (not skillGem or not gemIsType(skillGem, tag.keyword))) then
-							value = nullValue
-							break
-						end
-					elseif tag.type == "SkillName" then
-						if tag.skillName ~= skillName then
-							value = nullValue
-							break
-						end
-					elseif tag.type == "SkillPart" then
-						if tag.skillPart ~= skillPart then
-							value = nullValue
-							break
-						end
-					elseif tag.type == "SkillType" then
-						if not skillTypes or not skillTypes[tag.skillType] then
-							value = nullValue
-							break
-						end
-					elseif tag.type == "SlotName" then
-						if tag.slotName ~= slotName then
-							value = nullValue
-							break
-						end
-					end
+			if mod.name == modName and mod.type == "MORE" and band(flags, mod.flags) == mod.flags and (mod.keywordFlags == 0 or band(keywordFlags, mod.keywordFlags) ~= 0) and (not source or mod.source:match("[^:]+") == source) then
+				if mod[1] then
+					result = result * (1 + (context:EvalMod(mod, cfg) or 0) / 100)
+				else
+					result = result * (1 + mod.value / 100)
 				end
-				if tabulate then
-					if value and value ~= 0 then
-						t_insert(result, { value = value, mod = mod })
+			end
+		end
+	end
+	if self.parent then
+		result = result * self.parent:MoreInternal(context, cfg, flags, keywordFlags, source, ...)
+	end
+	return result
+end
+
+function ModListClass:FlagInternal(context, cfg, flags, keywordFlags, source, ...)
+	for i = 1, select('#', ...) do
+		local modName = select(i, ...)
+		for i = 1, #self do
+			local mod = self[i]
+			if mod.name == modName and mod.type == "FLAG" and band(flags, mod.flags) == mod.flags and (mod.keywordFlags == 0 or band(keywordFlags, mod.keywordFlags) ~= 0) and (not source or mod.source:match("[^:]+") == source) then
+				if mod[1] then
+					if context:EvalMod(mod, cfg) then
+						return true
 					end
-				elseif modType == "MORE" then
-					result = result * (1 + value / 100)
-				elseif modType == "FLAG" then
-					result = result or value
-				elseif modType == "LIST" then
+				elseif mod.value then
+					return true
+				end
+			end
+		end
+	end
+	if self.parent then
+		return self.parent:FlagInternal(context, cfg, flags, keywordFlags, source, ...)
+	end
+end
+
+function ModListClass:OverrideInternal(context, cfg, flags, keywordFlags, source, ...)
+	for i = 1, select('#', ...) do
+		local modName = select(i, ...)
+		for i = 1, #self do
+			local mod = self[i]
+			if mod.name == modName and mod.type == "OVERRIDE" and band(flags, mod.flags) == mod.flags and (mod.keywordFlags == 0 or band(keywordFlags, mod.keywordFlags) ~= 0) and (not source or mod.source:match("[^:]+") == source) then
+				if mod[1] then
+					local value = context:EvalMod(mod, cfg)
+					if value then
+						return value
+					end
+				elseif mod.value then
+					return mod.value
+				end
+			end
+		end
+	end
+	if self.parent then
+		return self.parent:OverrideInternal(context, cfg, flags, keywordFlags, source, ...)
+	end
+end
+
+function ModListClass:ListInternal(context, result, cfg, flags, keywordFlags, source, ...)
+	for i = 1, select('#', ...) do
+		local modName = select(i, ...)
+		for i = 1, #self do
+			local mod = self[i]
+			if mod.name == modName and mod.type == "LIST" and band(flags, mod.flags) == mod.flags and (mod.keywordFlags == 0 or band(keywordFlags, mod.keywordFlags) ~= 0) and (not source or mod.source:match("[^:]+") == source) then
+				local value
+				if mod[1] then
+					local value = context:EvalMod(mod, cfg) or nullValue
 					if value then
 						t_insert(result, value)
 					end
-				else
-					result = result + value
+				elseif mod.value then
+					t_insert(result, mod.value)
 				end
 			end
 		end
-		hack[i] = nil
 	end
-	return result
+	if self.parent then
+		self.parent:ListInternal(context, result, cfg, flags, keywordFlags, source, ...)
+	end
+end
+
+function ModListClass:TabulateInternal(context, result, modType, cfg, flags, keywordFlags, source, ...)
+	for i = 1, select('#', ...) do
+		local modName = select(i, ...)
+		for i = 1, #self do
+			local mod = self[i]
+			if mod.name == modName and (mod.type == modType or not modType) and band(flags, mod.flags) == mod.flags and (mod.keywordFlags == 0 or band(keywordFlags, mod.keywordFlags) ~= 0) and (not source or mod.source:match("[^:]+") == source) then
+				local value
+				if mod[1] then
+					value = context:EvalMod(mod, cfg)
+				else
+					value = mod.value
+				end
+				if value and (value ~= 0 or mod.type == "OVERRIDE") then
+					t_insert(result, { value = value, mod = mod })
+				end
+			end
+		end
+	end
+	if self.parent then
+		self.parent:TabulateInternal(context, result, modType, cfg, flags, keywordFlags, source, ...)
+	end
 end
 
 function ModListClass:Print()

@@ -3,8 +3,6 @@
 -- Class: Edit Control
 -- Basic edit control.
 --
-local launch, main = ...
-
 local m_max = math.max
 local m_min = math.min
 local m_floor = math.floor
@@ -36,10 +34,11 @@ local function newlineCount(str)
 	end
 end
 
-local EditClass = common.NewClass("EditControl", "ControlHost", "Control", "UndoHandler", function(self, anchor, x, y, width, height, init, prompt, filter, limit, changeFunc, lineHeight)
+local EditClass = newClass("EditControl", "ControlHost", "Control", "UndoHandler", "TooltipHost", function(self, anchor, x, y, width, height, init, prompt, filter, limit, changeFunc, lineHeight)
 	self.ControlHost()
 	self.Control(anchor, x, y, width, height)
 	self.UndoHandler()
+	self.TooltipHost()
 	self:SetText(init or "")
 	self.prompt = prompt
 	self.filter = filter or "^%w%p "
@@ -54,25 +53,26 @@ local EditClass = common.NewClass("EditControl", "ControlHost", "Control", "Undo
 	self.selCol = "^0"
 	self.selBGCol = "^xBBBBBB"
 	self.blinkStart = GetTime()
-	if self.filter == "%D" then
+	if self.filter == "%D" or self.filter == "^%-%d" then
 		-- Add +/- buttons for integer number edits
+		self.isNumeric = true
 		local function buttonSize()
 			local width, height = self:GetSize()
 			return height - 4
 		end
-		self.controls.buttonDown = common.New("ButtonControl", {"RIGHT",self,"RIGHT"}, -2, 0, buttonSize, buttonSize, "-", function()
+		self.controls.buttonDown = new("ButtonControl", {"RIGHT",self,"RIGHT"}, -2, 0, buttonSize, buttonSize, "-", function()
 			self:OnKeyUp("DOWN")
 		end)
-		self.controls.buttonUp = common.New("ButtonControl", {"RIGHT",self.controls.buttonDown,"LEFT"}, -1, 0, buttonSize, buttonSize, "+", function()
+		self.controls.buttonUp = new("ButtonControl", {"RIGHT",self.controls.buttonDown,"LEFT"}, -1, 0, buttonSize, buttonSize, "+", function()
 			self:OnKeyUp("UP")
 		end)
 	end
-	self.controls.scrollBarH = common.New("ScrollBarControl", {"BOTTOMLEFT",self,"BOTTOMLEFT"}, 1, -1, 0, 14, 60, "HORIZONTAL", true)
+	self.controls.scrollBarH = new("ScrollBarControl", {"BOTTOMLEFT",self,"BOTTOMLEFT"}, 1, -1, 0, 14, 60, "HORIZONTAL", true)
 	self.controls.scrollBarH.width = function()
 		local width, height = self:GetSize()
 		return width - (self.controls.scrollBarV.enabled and 16 or 2)
 	end
-	self.controls.scrollBarV = common.New("ScrollBarControl", {"TOPRIGHT",self,"TOPRIGHT"}, -1, 1, 14, 0, (lineHeight or 0) * 3, "VERTICAL", true)
+	self.controls.scrollBarV = new("ScrollBarControl", {"TOPRIGHT",self,"TOPRIGHT"}, -1, 1, 14, 0, (lineHeight or 0) * 3, "VERTICAL", true)
 	self.controls.scrollBarV.height = function()
 		local width, height = self:GetSize()
 		return height - (self.controls.scrollBarH.enabled and 16 or 2)
@@ -221,10 +221,9 @@ function EditClass:Draw(viewPort)
 	if not enabled then
 		return
 	end
-	if mOver and self.tooltip then
-		main:AddTooltipLine(16, self:GetProperty("tooltip"))
+	if mOver then
 		SetDrawLayer(nil, 100)
-		main:DrawTooltip(x, y, width, height, viewPort)
+		self:DrawTooltip(x, y, width, height, viewPort)
 		SetDrawLayer(nil, 0)
 	end
 	self:UpdateScrollBars()
@@ -412,6 +411,9 @@ function EditClass:OnKeyDown(key, doubleClick)
 		if self.lineHeight then
 			self:Insert("\n")
 		else
+			if self.enterFunc then
+				self.enterFunc(self.buf)
+			end
 			return
 		end
 	elseif key == "a" and ctrl then
@@ -428,6 +430,10 @@ function EditClass:OnKeyDown(key, doubleClick)
 	elseif key == "v" and ctrl then
 		local text = Paste()
 		if text then
+			if self.pasteFilter then
+				text = self.pasteFilter(text)
+			end
+			text = text:gsub("[\128-\255]","?")
 			if self.sel and self.sel ~= self.caret then
 				self:ReplaceSel(text)
 			else
@@ -492,8 +498,19 @@ function EditClass:OnKeyDown(key, doubleClick)
 		if self.sel and self.sel ~= self.caret then
 			self:ReplaceSel("")
 		elseif self.caret > 1 then
-			self.buf = self.buf:sub(1, self.caret - 2) .. self.buf:sub(self.caret)
-			self.caret = self.caret - 1
+			local len = 1
+			if IsKeyDown("CTRL") then
+				while self.caret - len > 1 and self.buf:sub(self.caret - len, self.caret - len):match("%s") and not self.buf:sub(self.caret - len - 1, self.caret - len - 1):match("\n") do
+					len = len + 1
+				end
+				if self.buf:sub(self.caret - len, self.caret - len):match("%w") then
+					while self.caret - len > 1 and self.buf:sub(self.caret - len - 1, self.caret - len - 1):match("%w") do
+						len = len + 1
+					end
+				end
+			end
+			self.buf = self.buf:sub(1, self.caret - 1 - len) .. self.buf:sub(self.caret)
+			self.caret = self.caret - len
 			self.sel = nil
 			self:ScrollCaretIntoView()
 			self.blinkStart = GetTime()
@@ -506,7 +523,18 @@ function EditClass:OnKeyDown(key, doubleClick)
 		if self.sel and self.sel ~= self.caret then
 			self:ReplaceSel("")
 		elseif self.caret <= #self.buf then
-			self.buf = self.buf:sub(1, self.caret - 1) .. self.buf:sub(self.caret + 1)
+			local len = 1
+			if IsKeyDown("CTRL") then
+				while self.caret + len <= #self.buf and self.buf:sub(self.caret + len - 1, self.caret + len - 1):match("%s") and not self.buf:sub(self.caret + len, self.caret + len):match("\n") do
+					len = len + 1
+				end
+				if self.buf:sub(self.caret + len - 1, self.caret + len - 1):match("%w") then
+					while self.caret + len <= #self.buf and self.buf:sub(self.caret + len, self.caret + len):match("%w") do
+						len = len + 1
+					end
+				end
+			end
+			self.buf = self.buf:sub(1, self.caret - 1) .. self.buf:sub(self.caret + len)
 			self.sel = nil
 			self.blinkStart = GetTime()
 			if self.changeFunc then
@@ -536,17 +564,17 @@ function EditClass:OnKeyUp(key)
 		if self.drag then
 			self.drag = false
 		end
-	elseif self.filter == "%D" then
+	elseif self.isNumeric then
 		local cur = tonumber(self.buf)
 		if key == "WHEELUP" or key == "UP" then
 			if cur then
-				self:SetText(tostring(cur + 1), true)
+				self:SetText(tostring(cur + (self.numberInc or 1)), true)
 			else
 				self:SetText("1", true)
 			end
 		elseif key == "WHEELDOWN" or key == "DOWN" then
-			if cur and cur > 0 then
-				self:SetText(tostring(cur - 1), true)
+			if cur and (self.filter ~= "%D" or cur > 0 )then
+				self:SetText(tostring(cur - (self.numberInc or 1)), true)
 			else
 				self:SetText("0", true)
 			end

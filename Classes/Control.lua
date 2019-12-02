@@ -3,7 +3,6 @@
 -- Class: Control
 -- UI control base class
 --
-
 local t_insert = table.insert
 local m_floor = math.floor
 
@@ -19,16 +18,16 @@ local anchorPos = {
 	     ["CENTER"] = { 0.5, 0.5 },
 }
 
-local ControlClass = common.NewClass("Control", function(self, anchor, x, y, width, height)
-	self.x = x
-	self.y = y
-	self.width = width
-	self.height = height
+local ControlClass = newClass("Control", function(self, anchor, x, y, width, height)
+	self.x = x or 0
+	self.y = y or 0
+	self.width = width or 0
+	self.height = height or 0
 	self.shown = true
 	self.enabled = true
 	self.anchor = { }
 	if anchor then
-		self:SetAnchor(anchor[1], anchor[2], anchor[3])
+		self:SetAnchor(anchor[1], anchor[2], anchor[3], nil, nil, anchor[4])
 	end
 end)
 
@@ -40,10 +39,11 @@ function ControlClass:GetProperty(name)
 	end
 end
 
-function ControlClass:SetAnchor(point, other, otherPoint, x, y)
+function ControlClass:SetAnchor(point, other, otherPoint, x, y, collapse)
 	self.anchor.point = point
 	self.anchor.other = other
 	self.anchor.otherPoint = otherPoint
+	self.anchor.collapse = collapse
 	if x and y then
 		self.x = x
 		self.y = y
@@ -51,6 +51,9 @@ function ControlClass:SetAnchor(point, other, otherPoint, x, y)
 end
 
 function ControlClass:GetPos()
+	if self.anchor.collapse and self.anchor.other and not self.anchor.other:GetProperty("shown") then
+		return self.anchor.other:GetPos()
+	end
 	local x = self:GetProperty("x")
 	local y = self:GetProperty("y")
 	if self.anchor.other then
@@ -78,7 +81,7 @@ function ControlClass:GetSize()
 end
 
 function ControlClass:IsShown()
-	return (not self.anchor.other or self.anchor.other:IsShown()) and self:GetProperty("shown")
+	return (not self.anchor.other or self.anchor.collapse or self.anchor.other:IsShown()) and self:GetProperty("shown")
 end
 
 function ControlClass:IsEnabled()

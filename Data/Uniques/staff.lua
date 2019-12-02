@@ -1,314 +1,458 @@
--- Item data (c) Grinding Gear Games
+ï»¿-- Item data (c) Grinding Gear Games
 
 return {
 -- Weapon: Staff
 [[
 Agnerod East
 Imperial Staff
-Staff
-Physical Damage: 49–147
-Critical Strike Chance: 7.20%
-Attacks per Second: 1.15
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 66, 158 Str, 113 Int
-12% Chance to Block
-+1 to Level of Socketed Lightning Gems
-+(80 to 120) to Intelligence
-(30 to 50)% increased Lightning Damage
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
+{variant:1}+1 to Level of Socketed Lightning Gems
+{variant:2}+2 to Level of Socketed Lightning Gems
++(80-120) to Intelligence
+(30-50)% increased Lightning Damage
 100% increased Shock Duration on Enemies
 40% increased Strength Requirement
 Damage Penetrates 20% Lightning Resistance
 ]],[[
 Agnerod North
 Imperial Staff
-Staff
-Physical Damage: 49–147
-Critical Strike Chance: 7.20%
-Attacks per Second: 1.15
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 66, 158 Str, 113 Int
-12% Chance to Block
-+1 to Level of Socketed Lightning Gems
-+(80 to 120) to Intelligence
-(30 to 50)% increased Lightning Damage
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
+{variant:1}+1 to Level of Socketed Lightning Gems
+{variant:2}+2 to Level of Socketed Lightning Gems
++(80-120) to Intelligence
+(30-50)% increased Lightning Damage
 15% chance to Shock
 40% increased Strength Requirement
 Damage Penetrates 20% Lightning Resistance
 ]],[[
 Agnerod South
 Imperial Staff
-Staff
-Physical Damage: 49–147
-Critical Strike Chance: 7.20%
-Attacks per Second: 1.15
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 66, 158 Str, 113 Int
-12% Chance to Block
-+1 to Level of Socketed Lightning Gems
-+(80 to 120) to Intelligence
-(30 to 50)% increased Lightning Damage
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
+{variant:1}+1 to Level of Socketed Lightning Gems
+{variant:2}+2 to Level of Socketed Lightning Gems
++(80-120) to Intelligence
+(30-50)% increased Lightning Damage
 +5% to Maximum Lightning Resistance
 40% increased Strength Requirement
 Damage Penetrates 20% Lightning Resistance
 ]],[[
 Agnerod West
 Imperial Staff
-Staff
-Physical Damage: 49–147
-Critical Strike Chance: 7.20%
-Attacks per Second: 1.15
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 66, 158 Str, 113 Int
-12% Chance to Block
-+1 to Level of Socketed Lightning Gems
-+(80 to 120) to Intelligence
-(30 to 50)% increased Lightning Damage
-Adds (5-15 to 100-140) Lightning Damage to Spells
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
+{variant:1}+1 to Level of Socketed Lightning Gems
+{variant:2}+2 to Level of Socketed Lightning Gems
++(80-120) to Intelligence
+(30-50)% increased Lightning Damage
+Adds (5-15) to (100-140) Lightning Damage to Spells
 40% increased Strength Requirement
 Damage Penetrates 20% Lightning Resistance
 ]],[[
 The Blood Thorn
 Gnarled Branch
-Staff
-Physical Damage: 16–34
-Critical Strike Chance: 6.40%
-Attacks per Second: (1.37 to 1.43)
-12% Chance to Block
+Variant: Pre 2.6.0
+Variant: Current
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
 12% Chance to Block
 100% increased Physical Damage
-(5 to 10)% increased Attack Speed
-Reflects (22 to 44) Physical Damage to Attackers on Block
+(5-10)% increased Attack Speed
+Reflects (22-44) Physical Damage to Attackers on Block
 Curse Enemies with level 5 Vulnerability on Block
+]],[[
+Cane of Unravelling
+Ezomyte Staff
+Variant: Pre 3.5.0
+Variant: Current
+Requires Level: 62
+18% Chance to Block 
++2 to Level of Socketed Chaos Gems
+{variant:1}(60â€“80)% increased Chaos Damage
+{variant:2}(20â€“30)% increased Chaos Damage
+{variant:2}+(40-55)% to Non-Ailment Chaos Damage over Time Multiplier
+2% increased Cast Speed per Power Charge
+Gain a Power Charge after spending a total of 200 Mana
+2 Mana Regenerated per Second per Power Charge
+]],[[
+Disintegrator
+MaelstrÃ¶m Staff
+Source: Drops from unique{The Elder} (Uber)
+Variant: Pre 3.7.0
+Variant: Current
+Requires Level 64
+20% Chance to Block
+{variant:1}Adds (270â€“300) to (340â€“380) Physical Damage
+{variant:2}Adds (250â€“280) to (315â€“355) Physical Damage
+Adds (376â€“400) to (568â€“600) Physical Damage to Spells
++1 to Maximum Siphoning Charges per Elder or Shaper Item Equipped
+25% chance to gain a Siphoning Charge when you use a Skill
+Adds (12â€“14) to (15â€“16) Physical Damage to Attacks and Spells per Siphoning Charge
+Gain 4% of Non-Chaos Damage as extra Chaos Damage per Siphoning Charge
+1% additional Physical Damage Reduction from Hits per Siphoning Charge
+0.2% of Damage Leeched as Life per Siphoning Charge
+Take 150 Physical Damage per Second per Siphoning Charge if you've used a Skill Recently
+Elder Item
+]],[[
+Duskdawn
+MaelstrÃ¶m Staff
+Source: Vendor recipe
+Variant: Pre 2.6.0
+Variant: Pre 3.5.0
+Variant: Current
+Requires Level 64, 113 Str, 113 Int
+Implicits: 2
+{variant:1}18% Chance to Block Attack Damage while wielding a Staff
+{variant:2,3}20% Chance to Block Attack Damage while wielding a Staff
+{variant:1,2}4% Chance to Block Attack Damage while wielding a Staff
+{variant:3}10% Chance to Block Attack Damage while wielding a Staff
+(60-80)% increased Critical Strike Chance for Spells
+Gain (10-20)% of Elemental Damage as Extra Chaos Damage
++1% to Critical Strike Multiplier per 1% Block Chance
++60% to Critical Strike Multiplier if you've dealt a Non-Critical Strike Recently
+{variant:1,2}120% increased Spell Damage if you've dealt a Critical Strike Recently
+{variant:3}(120-150)% increased Spell Damage if you've dealt a Critical Strike Recently
 ]],[[
 Dying Breath
 Coiled Staff
-Staff
-Physical Damage: 23–48
-Critical Strike Chance: 6.40%
-Attacks per Second: 1.20
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 23, 43 Str, 43 Int
-18% Chance to Block
+Implicits: 2
+{variant:1}18% Chance to Block
+{variant:2}20% Chance to Block
 18% increased Cast Speed
 18% increased maximum Mana
-18% increased Radius of Aura Skills
-18% increased Radius of Curse Skills
+18% increased Area of Effect of Aura Skills
+18% increased Area of Effect of Curse Skills
 Nearby Enemies have 18% increased Effect of Curses on them
 Nearby allies gain 18% increased Damage
 18% increased effect of Non-Curse Auras you Cast
 ]],[[
+The Enmity Divine
+Imperial Staff
+League: Harbinger
+Requires Level 66, 113 Str, 113 Int
+18% Chance to Block
+Socketed Gems are supported by level 10 Life Leech
+Grants Summon Harbinger of Brutality Skill
+5% Chance to Block
+Adds (160-185) to (200-225) Physical Damage
+(30-40)% increased Critical Strike Chance
+]],[[
 Femurs of the Saints
 Primordial Staff
-Staff
-Physical Damage: 47–141
-Critical Strike Chance: 6.80%
-Attacks per Second: 1.15
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 58, 99 Str, 99 Int
-12% Chance to Block
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
 +2 to Level of Socketed Minion Gems
-Minions Regenerate (1.5 to 2.5)% Life per Second
+Minions Regenerate (1.5-2.5)% Life per Second
 2% increased Minion Attack and Cast Speed per Skeleton you own
 2% increased Minion Duration per Zombie you own
-(8 to 12)% increased Minion Damage per Spectre you own
+(8-12)% increased Minion Damage per Spectre you own
 ]],[[
 Fencoil
 Gnarled Branch
-Staff
-Physical Damage: 8–17
-Critical Strike Chance: 6.40%
-Attacks per Second: 1.30
-12% Chance to Block
+Upgrade: Upgrades to unique{Mirebough} via prophecy{Trapped in the Tower}
+Variant: Pre 2.6.0
+Variant: Current
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
 Socketed Gems are Supported by level 8 Trap
-(40 to 50)% increased Damage
-(10 to 20)% increased maximum Life
-(10 to 20)% increased maximum Mana
+(40-50)% increased Damage
+(10-20)% increased maximum Life
+(10-20)% increased maximum Mana
+]],[[
+Mirebough
+Gnarled Branch
+Source: Upgraded from unique{Fencoil} via prophecy{Trapped in the Tower}
+Requires Level 32
+18% Chance to Block
+Socketed Gems are Supported by Level 16 Trap
+Socketed Gems are Supported by Level 16 Cluster Trap
+Socketed Gems are Supported by Level 16 Trap and Mine Damage
+(10â€“20)% increased maximum Mana
+(10â€“20)% increased maximum Life
+(40â€“50)% increased Damage
+]],[[
+The Grey Spire
+Judgement Staff
+Requires Level 68
++18% Chance to Block Attack Damage while wielding a Staff
+Has no Sockets
+(250â€“300)% increased Global Damage
+(20â€“30)% increased Attack Speed
++(1â€“4)% to all maximum Resistances
 ]],[[
 Hegemony's Era
 Judgement Staff
-Staff
-Physical Damage: (245-255 to 311-341)
-Critical Strike Chance: (7.92 to 8.58)%
-Attacks per Second: (1.4 to 1.45)
+Variant: Pre 2.6.0
+Variant: Pre 3.7.0
+Variant: Current
 Requires Level 68, 113 Str, 113 Int
-12% Chance to Block
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2,3}18% Chance to Block
 6% Chance to Block
-Adds (180-190 to 190-220) Physical Damage
-(12 to 16)% increased Attack Speed
-(20 to 30)% increased Critical Strike Chance
-+1 maximum Power Charge
+{variant:1,2}Adds (180-190) to (190-220) Physical Damage
+{variant:3}Adds (165-175) to (185-205) Physical Damage
+(12-16)% increased Attack Speed
+(20-30)% increased Critical Strike Chance
++1 to Maximum Power Charges
 10% chance to gain a Power Charge if you Knock an Enemy Back with Melee Damage
+]],[[
+Martyr of Innocence
+Highborn Staff
+Variant: Pre 3.5.0
+Variant: Current
+Requires Level 52, 89 Str, 89 Int
+18% Chance to Block
+(12-16)% Chance to Block
+Adds (350-400) to (500-600) Fire Damage
+{variant:1}Adds (130-150) to (200-250) Fire Damage to Spells
+{variant:2}Adds (230-250) to (300-350) Fire Damage to Spells
+Grants level 15 Vengeance Skill
+{variant:1}100% increased Fire Damage if you have been Hit Recently
+{variant:2}100% increased Fire Damage
+Immune to Freeze and Chill while Ignited
+Damage Penetrates 15% of Fire Resistance if you have Blocked Recently
+]],[[
+Pillar of the Caged God
+Iron Staff
+Variant: Current
+Requires Level 13, 27 Str, 27 Int
+18% Chance to Block Attack Damage while wielding a Staff
+1% increased Area of Effect of Area Skills per 20 Intelligence
+1% increased Attack Speed per 10 Dexterity
+16% increased Physical Weapon Damage per 10 Strength
 ]],[[
 Pillar of the Caged God
 Long Staff
-Staff
-Physical Damage: 17–28
-Critical Strike Chance: 6.40%
-Attacks per Second: 1.30
+Variant: Pre 2.6.0
+Variant: Pre 3.7.0
 Requires Level 13, 27 Str, 27 Int
-12% Chance to Block
-1% increased Area of Effect Radius per 20 Intelligence
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
+1% increased Area of Effect of Area Skills per 20 Intelligence
 1% increased Attack Speed per 10 Dexterity
 16% increased Physical Weapon Damage per 10 Strength
 ]],[[
 Pledge of Hands
 Judgement Staff
-Staff
-Physical Damage: 61–113
-Critical Strike Chance: 6.60%
-Attacks per Second: 1.25
+League: Legion
+Source: Drops from normal{Vaal} legion
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 68, 113 Str, 113 Int
-12% Chance to Block
-Socketed Gems are Supported by level 30 Spell Echo
-(120 to 160)% increased Spell Damage
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block Attack Damage while wielding a Staff
+Socketed Gems are Supported by level 30 Greater Spell Echo
+(120-160)% increased Spell Damage
 100% increased maximum Mana
+]],[[
+Realmshaper
+Iron Staff
+Upgrade: Upgrades to unique{Realm Ender} via prophecy{The Beginning and the End}
+Variant: Pre 2.6.0
+Variant: Current
+Requires Level 18, 35 Str, 35 Int
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
++1 to Level of Socketed Fire Gems
++1 to Level of Socketed Cold Gems
+Socketed Gems are Supported by level 5 Cold to Fire
+Adds (10-15) to (20-25) Fire Damage
+Adds (10-15) to (20-25) Cold Damage
+(30-50)% increased Elemental Damage
 ]],[[
 Realm Ender
 Iron Staff
-Staff
-Physical Damage: 16–47
-Elemental Damage: (10-15 to 20-25), (10-15 to 20-25)
-Critical Strike Chance: 7.00%
-Attacks per Second: 1.20
+Source: Upgraded from unique{Realmshaper} using prophecy{The Beginning and the End}
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 40, 35 Str, 35 Int
-12% Chance to Block
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
 +1 to Level of Socketed Fire Gems
 +1 to Level of Socketed Cold Gems
 +2 to Level of Socketed Elemental Gems
 Socketed Gems are Supported by level 5 Cold to Fire
-Adds (10-15 to 20-25) Fire Damage
-Adds (10-15 to 20-25) Cold Damage
-(30 to 50)% increased Elemental Damage
-]],[[
-Realmshaper
-Iron Staff
-Staff
-Physical Damage: 16–47
-Elemental Damage: (10-15 to 20-25), (10-15 to 20-25)
-Critical Strike Chance: 7.00%
-Attacks per Second: 1.20
-Requires Level 18, 35 Str, 35 Int
-12% Chance to Block
-+1 to Level of Socketed Fire Gems
-+1 to Level of Socketed Cold Gems
-Socketed Gems are Supported by level 5 Cold to Fire
-Adds (10-15 to 20-25) Fire Damage
-Adds (10-15 to 20-25) Cold Damage
-(30 to 50)% increased Elemental Damage
+Adds (10-15) to (20-25) Fire Damage
+Adds (10-15) to (20-25) Cold Damage
+(30-50)% increased Elemental Damage
 ]],[[
 The Searing Touch
 Lathi
+Variant: Pre 2.6.0
+Variant: {2_6}Pre 3.0.0
 Variant: Current
-Staff
-Physical Damage: 62–103
-Critical Strike Chance: 6.40%
-Attacks per Second: 1.30
 Requires Level 60, 113 Str, 113 Int
-12% Chance to Block
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2,3}18% Chance to Block
 +2 to Level of Socketed Fire Gems
-(30 to 50)% increased Spell Damage
-(20 to 40)% increased Fire Damage
+{variant:1,2}(30-50)% increased Spell Damage
+{variant:1,2}(20-40)% increased Fire Damage
+{variant:3}(70â€“90)% increased Fire Damage
 10% increased Cast Speed
 70% increased Burning Damage
 ]],[[
 The Searing Touch
 Long Staff
 Variant: Pre 2.0.0
-Staff
-Physical Damage: 62–103
-Critical Strike Chance: 6.40%
-Attacks per Second: 1.30
 Requires Level 60, 113 Str, 113 Int
 12% Chance to Block
 +2 to Level of Socketed Fire Gems
-(30 to 50)% increased Spell Damage
-(20 to 40)% increased Fire Damage
+(30-50)% increased Spell Damage
+(20-40)% increased Fire Damage
 10% increased Cast Speed
 70% increased Burning Damage
 ]],[[
 Sire of Shards
 Serpentine Staff
-Staff
-Physical Damage: 46–95
-Critical Strike Chance: 6.40%
-Attacks per Second: 1.20
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 49, 85 Str, 85 Int
-18% Chance to Block
-+(15 to 20) to All Attributes
-+(5 to 7)% to All Elemental Resistances
-(60 to 100)% increased Projectile Damage
+Implicits: 2
+{variant:1}18% Chance to Block
+{variant:2}20% Chance to Block
++(15-20) to All Attributes
++(5-7)% to All Elemental Resistances
+(60-100)% increased Projectile Damage
 20% increased Light Radius
 Socketed Gems fire 4 additional Projectiles
 Socketed Gems fire Projectiles in a Nova
 ]],[[
+Soulwrest
+Ezomyte Staff
+League: Delve
+Requires Level 62
++18% Chance to Block Attack Damage while wielding a Staff
+Trigger Level 20 Summon Phantasm Skill when you Consume a Corpse
+(100â€“140)% increased Spell Damage
+(25â€“30)% increased Cast Speed
+(80â€“100)% increased Mana Regeneration Rate
+Minions deal (45â€“51) to (66â€“78) additional Physical Damage
+If you Consumed a Corpse Recently, you and nearby Allies regenerate 5% of Life per second
+]],[[
 The Stormheart
 Royal Staff
-Staff
-Physical Damage: (41-46 to 126-140)
-Elemental Damage: (25-35 to 45-60), (1-10 to 70-90)
-Critical Strike Chance: (8.64 to 9.72)%
-Attacks per Second: 1.15
+Upgrade: Upgrades to unique{The Stormwall} via prophecy{The Storm Spire}
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 28, 51 Str, 51 Int
-12% Chance to Block
-(80 to 100)% increased Physical Damage
-Adds (25-35 to 45-60) Cold Damage
-Adds (1-10 to 70-90) Lightning Damage
-(20 to 35)% increased Critical Strike Chance
-You Cannot Be Shocked While Frozen
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
+(80-100)% increased Physical Damage
+Adds (25-35) to (45-60) Cold Damage
+Adds (1-10) to (70-90) Lightning Damage
+(20-35)% increased Critical Strike Chance
+{variant:1}You Cannot Be Shocked While Frozen
+{variant:2}You Cannot Be Shocked While Chilled
+{variant:2}50% chance to Shock Chilled Enemies
+]],[[
+The Stormwall
+Royal Staff
+Source: Upgraded from unique{The Stormheart} via prophecy{The Storm Spire}
+Requires Level 60
+18% Chance to Block
+15% Chance to Block
+Adds (242â€“260) to (268â€“285) Physical Damage
+(20â€“35)% increased Critical Strike Chance
+50% of Physical Damage Converted to Cold Damage
+50% of Physical Damage Converted to Lightning Damage
+Cannot be Shocked while Chilled
+(30â€“40)% chance to Chill Attackers for 4 seconds on Block
+(30â€“40)% chance to Shock Attackers for 4 seconds on Block
 ]],[[
 Taryn's Shiver
-Maelström Staff
+MaelstrÃ¶m Staff
 Variant: Pre 2.0.0
+Variant: Pre 2.6.0
 Variant: Current
-Staff
-Physical Damage: 57–119
-Critical Strike Chance: 6.40%
-Attacks per Second: 1.20
 Requires Level 64, 113 Str, 113 Int
-18% Chance to Block
-+1 to Level of Socketed Cold Gems
-{variant:1}(40 to 50)% increased Spell Damage
-{variant:2}(50 to 60)% increased Spell Damage
-(40 to 50)% increased Cold Damage
-(10 to 20)% increased Cast Speed
+Implicits: 2
+{variant:1,2}18% Chance to Block
+{variant:3}20% Chance to Block
+{variant:1,2}+1 to Level of Socketed Cold Gems
+{variant:3}+2 to Level of Socketed Cold Gems
+{variant:1}(40-50)% increased Spell Damage
+{variant:2,3}(50-60)% increased Spell Damage
+(40-50)% increased Cold Damage
+(10-20)% increased Cast Speed
 8% chance to Freeze
 Enemies Frozen by you take 20% increased Damage
 ]],[[
 Tremor Rod
 Military Staff
-Staff
-Physical Damage: 34–101
-Critical Strike Chance: 7.00%
-Attacks per Second: 1.20
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 45, 78 Str, 78 Int
-12% Chance to Block
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
 Socketed Gems are Supported by level 10 Remote Mine
 35% less Mine Damage
-(40 to 60)% increased Spell Damage
-(15 to 20)% reduced Enemy Stun Threshold
-(40 to 60)% increased Mine Laying Speed
+(40-60)% increased Spell Damage
+(15-20)% reduced Enemy Stun Threshold
+(40-60)% increased Mine Laying Speed
 Mines can be Detonated an additional time
 ]],[[
 The Whispering Ice
 Vile Staff
-Staff
-Physical Damage: 33–62
-Critical Strike Chance: 6.60%
-Attacks per Second: 1.25
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 33, 59 Str, 59 Int
-12% Chance to Block
+Implicits: 2
+{variant:1}12% Chance to Block
+{variant:2}18% Chance to Block
 +1 to Level of Socketed Support Gems
 Grants level 1 Icestorm Skill
-(8 to 12)% increased Cast Speed
+(8-12)% increased Cast Speed
 1% increased Spell Damage per 10 Intelligence
-(14 to 18)% increased Intelligence
+(14-18)% increased Intelligence
 ]],[[
 Xirgil's Crank
 Coiled Staff
-Staff
-Physical Damage: 23–48
-Critical Strike Chance: 6.40%
-Attacks per Second: 1.20
+Source: Drops in The Lord's Labyrinth
+Variant: Pre 2.6.0
+Variant: Current
 Requires Level 28, 43 Str, 43 Int
-18% Chance to Block
+Implicits: 2
+{variant:1}18% Chance to Block
+{variant:2}20% Chance to Block
 +1 to Level of Socketed Gems
 15% Chance to Block
-(60 to 80)% increased Spell Damage
-+(70 to 100) to Maximum Energy Shield
+(60-80)% increased Spell Damage
++(70-100) to Maximum Energy Shield
 Reflects 1 to 150 Lightning Damage to Melee Attackers
 20% Chance for Energy Shield Recharge to Start when you Block
 ]],

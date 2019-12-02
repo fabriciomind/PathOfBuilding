@@ -3,12 +3,10 @@
 -- Class: Text List
 -- Simple list control for displaying a block of text
 --
-local launch, main = ...
-
-local TextListClass = common.NewClass("TextListControl", "Control", "ControlHost", function(self, anchor, x, y, width, height, columns, list)
+local TextListClass = newClass("TextListControl", "Control", "ControlHost", function(self, anchor, x, y, width, height, columns, list)
 	self.Control(anchor, x, y, width, height)
 	self.ControlHost()
-	self.controls.scrollBar = common.New("ScrollBarControl", {"RIGHT",self,"RIGHT"}, -1, 0, 18, 0, 40)
+	self.controls.scrollBar = new("ScrollBarControl", {"RIGHT",self,"RIGHT"}, -1, 0, 18, 0, 40)
 	self.controls.scrollBar.height = function()
 		local width, height = self:GetSize()
 		return height - 2
@@ -43,7 +41,7 @@ function TextListClass:Draw(viewPort)
 		local lineY = -scrollBar.offset
 		for _, lineInfo in ipairs(self.list) do
 			if lineInfo[colIndex] then
-				DrawString(colInfo.x, lineY, colInfo.align, lineInfo.height, "VAR", lineInfo[colIndex])
+				DrawString(lineInfo.x or colInfo.x, lineY, lineInfo.align or colInfo.align, lineInfo.height, lineInfo.font or "VAR", lineInfo[colIndex])
 			end
 			lineY = lineY + lineInfo.height
 		end
@@ -67,7 +65,9 @@ function TextListClass:OnKeyUp(key)
 	end
 	if key == "WHEELDOWN" then
 		self.controls.scrollBar:Scroll(1)
+		return self
 	elseif key == "WHEELUP" then
 		self.controls.scrollBar:Scroll(-1)
+		return self
 	end
 end

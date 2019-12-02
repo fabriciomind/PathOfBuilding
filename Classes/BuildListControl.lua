@@ -3,175 +3,240 @@
 -- Class: Build List
 -- Build list control.
 --
-local launch, main = ...
+local ipairs = ipairs
+local s_format = string.format
 
-local t_insert = table.insert
-local t_remove = table.remove
-local m_min = math.min
-local m_max = math.max
-local m_floor = math.floor
-
-local BuildListClass = common.NewClass("BuildList", "Control", "ControlHost", function(self, anchor, x, y, width, height, listMode)
-	self.Control(anchor, x, y, width, height)
-	self.ControlHost()
+local BuildListClass = newClass("BuildListControl", "ListControl", function(self, anchor, x, y, width, height, listMode)
+	self.ListControl(anchor, x, y, width, height, 20, false, false, listMode.list)
 	self.listMode = listMode
-	self.controls.scrollBar = common.New("ScrollBarControl", {"RIGHT",self,"RIGHT"}, -1, 0, 18, 0, 40)
-	self.controls.scrollBar.height = function()
-		local width, height = self:GetSize()
-		return height - 2
+	self.colList = { 
+		{ width = function() return self:GetProperty("width") - 172 end }, 
+		{ },
+	}
+	self.showRowSeparators = true
+	self.controls.path = new("PathControl", {"BOTTOM",self,"TOP"}, 0, -2, width, 24, main.buildPath, listMode.subPath, function(subPath)
+		listMode.subPath = subPath
+		listMode:BuildList()
+		self.selIndex = nil
+		self.selValue = nil
+		self.selDragging = false
+		self.selDragActive = false
+		self.otherDragSource = false
+	end)
+	function self.controls.path:CanReceiveDrag(type, build)
+		return type == "Build" and #self.folderList > 1
 	end
-	self.controls.scrollBar.locked = function()
-		return self.listMode.edit
-	end
-	self.controls.nameEdit = common.New("EditControl", {"TOPLEFT",self,"TOPLEFT"}, 0, 0, 0, 20, nil, nil, "\\/:%*%?\"<>|", 50)
-	self.controls.nameEdit.shown = function()
-		return self.listMode.edit
-	end
-	self.controls.nameEdit.width = function()
-		local width, height = self:GetSize()
-		return width - 20
-	end
-end)
-
-function BuildListClass:ScrollSelIntoView()
-	if self.listMode.sel then
-		local width, height = self:GetSize()
-		self.controls.scrollBar:SetContentDimension(#self.listMode.list * 20, height - 4)
-		self.controls.scrollBar:ScrollIntoView((self.listMode.sel - 2) * 20, 60)
-	end
-end
-
-function BuildListClass:SelectIndex(index)
-	if self.listMode.list[index] then
-		self.listMode.sel = index
-		self:ScrollSelIntoView()
-	end
-end
-
-function BuildListClass:IsMouseOver()
-	if not self:IsShown() then
-		return
-	end
-	return self:IsMouseInBounds() or self:GetMouseOverControl()
-end
-
-function BuildListClass:Draw(viewPort)
-	local x, y = self:GetPos()
-	local width, height = self:GetSize()
-	local list = self.listMode.list
-	local scrollBar = self.controls.scrollBar
-	scrollBar:SetContentDimension(#list * 20, height - 4)
-	if self.hasFocus then
-		SetDrawColor(1, 1, 1)
-	else
-		SetDrawColor(0.5, 0.5, 0.5)
-	end
-	DrawImage(nil, x, y, width, height)
-	SetDrawColor(0, 0, 0)
-	DrawImage(nil, x + 1, y + 1, width - 2, height - 2)
-	SetViewport(x + 2, y + 2, width - 22, height - 4)
-	local selBuildIndex = self.listMode.sel
-	local minIndex = m_floor(scrollBar.offset / 20 + 1)
-	local maxIndex = m_min(m_floor((scrollBar.offset + height) / 20 + 1), #list)
-	for index = minIndex, maxIndex do
-		local build = list[index]
-		local lineY = 20 * (index - 1) - scrollBar.offset
-		if index == selBuildIndex then
-			self.controls.nameEdit.y = lineY + 2
-		end
-		local mOverLine
-		if not scrollBar.dragging then
-			local cursorX, cursorY = GetCursorPos()
-			local relX = cursorX - (x + 2)
-			local relY = cursorY - (y + 2)
-			if relX >= 0 and relX < width - 19 and relY >= 0 and relY >= lineY and relY < height - 2 and relY < lineY + 20 then
-				mOverLine = true
-			end
-		end
-		if index == selBuildIndex then
-			SetDrawColor(1, 1, 1)
-		else
-			SetDrawColor(0.5, 0.5, 0.5)
-		end
-		DrawImage(nil, 0, lineY, width - 22, 20)
-		if mOverLine or index == selBuildIndex then
-			SetDrawColor(0.33, 0.33, 0.33)
-		elseif index % 2 == 0 then
-			SetDrawColor(0.05, 0.05, 0.05)
-		else
-			SetDrawColor(0, 0, 0)
-		end
-		DrawImage(nil, 0, lineY + 1, width - 22, 18)
-		if self.listMode.edit ~= index then
-			DrawString(0, lineY + 2, "LEFT", 16, "VAR", "^7"..(build.buildName or "?"))
-			SetDrawColor(build.className and data.colorCodes[build.className:upper()] or "^7")
-			DrawString(width - 160, lineY + 2, "LEFT", 16, "VAR", string.format("Level %d %s", build.level or 1, (build.ascendClassName ~= "None" and build.ascendClassName) or build.className or "?"))
-		end
-	end
-	SetViewport()
-	if self.listMode.edit then
-		self.listMode:SelectControl(self.controls.nameEdit)
-	end
-	self:DrawControls(viewPort)
-end
-
-function BuildListClass:OnKeyDown(key, doubleClick)
-	if not self:IsShown() or not self:IsEnabled() then
-		return
-	end
-	local mOverControl = self:GetMouseOverControl()
-	if mOverControl and mOverControl.OnKeyDown then
-		return mOverControl:OnKeyDown(key)
-	end
-	if not self:IsMouseOver() and key:match("BUTTON") then
-		return
-	end
-	if self.listMode.edit then
-		return self
-	end
-	if key == "LEFTBUTTON" then
-		self.listMode.sel = nil
-		local x, y = self:GetPos()
-		local width, height = self:GetSize()
-		local cursorX, cursorY = GetCursorPos()
-		if cursorX >= x + 2 and cursorY >= y + 2 and cursorX < x + width - 20 and cursorY < y + height - 2 then
-			local index = math.floor((cursorY - y - 2 + self.controls.scrollBar.offset) / 20) + 1
-			local selBuild = self.listMode.list[index]
-			if selBuild then
-				self.listMode.sel = index
-				if doubleClick then
-					self.listMode:LoadSel()
+	function self.controls.path:ReceiveDrag(type, build, source)
+		if type == "Build" then
+			for index, folder in ipairs(self.folderList) do
+				if index < #self.folderList and folder.button:IsMouseOver() then
+					if build.folderName then
+						main:MoveFolder(build.folderName, main.buildPath..build.subPath, main.buildPath..folder.path)
+					else
+						os.rename(build.fullFileName, listMode:GetDestName(folder.path, build.fileName))
+					end
+					listMode:BuildList()
 				end
 			end
 		end
-	elseif key == "UP" then
-		self:SelectIndex(((self.listMode.sel or 1) - 2) % #self.listMode.list + 1)
-	elseif key == "DOWN" then
-		self:SelectIndex((self.listMode.sel or #self.listMode.list) % #self.listMode.list + 1)
-	elseif key == "HOME" then
-		self:SelectIndex(1)
-	elseif key == "END" then
-		self:SelectIndex(#self.listMode.list)
-	elseif self.listMode.sel then
-		if key == "BACK" or key == "DELETE" then
-			self.listMode:DeleteSel()
-		elseif key == "F2" then
-			self.listMode:RenameSel()
-		elseif key == "RETURN" then
-			self.listMode:LoadSel()
+	end
+	self.dragTargetList = { self.controls.path, self }
+end)
+
+function BuildListClass:SelByFileName(selFileName)
+	for index, build in ipairs(self.list) do
+		if build.fileName == selFileName then
+			self:SelectIndex(index)
+			break
 		end
 	end
-	return self
 end
 
-function BuildListClass:OnKeyUp(key)
-	if not self:IsShown() or not self:IsEnabled() then
-		return
+function BuildListClass:LoadBuild(build)
+	if build.folderName then
+		self.controls.path:SetSubPath(self.listMode.subPath .. build.folderName  .. "/")
+	else
+		main:SetMode("BUILD", build.fullFileName, build.buildName)
 	end
-	if key == "WHEELDOWN" then
-		self.controls.scrollBar:Scroll(1)
-	elseif key == "WHEELUP" then
-		self.controls.scrollBar:Scroll(-1)
+end
+
+function BuildListClass:NewFolder()
+	main:OpenNewFolderPopup(main.buildPath..self.listMode.subPath, function(newFolderName)
+		if newFolderName then
+			self.listMode:BuildList()
+		end
+		self.listMode:SelectControl(self)
+	end)
+end
+
+function BuildListClass:RenameBuild(build, copyOnName)
+	local controls = { }
+	controls.label = new("LabelControl", nil, 0, 20, 0, 16, "^7Enter the new name for this "..(build.folderName and "folder:" or "build:"))
+	controls.edit = new("EditControl", nil, 0, 40, 350, 20, build.folderName or build.buildName, nil, "\\/:%*%?\"<>|%c", 100, function(buf)
+		controls.save.enabled = false
+		if build.folderName then
+			if buf:match("%S") then
+				controls.save.enabled = true
+			end
+		else
+			if buf:match("%S") then
+				if buf:lower() ~= build.buildName:lower() then
+					local newName = buf..".xml"
+					local newFile = io.open(main.buildPath..build.subPath..newName, "r")
+					if newFile then
+						newFile:close()
+					else
+						controls.save.enabled = true
+					end
+				elseif buf ~= build.buildName then
+					controls.save.enabled = true
+				end
+			end
+		end
+	end)
+	controls.save = new("ButtonControl", nil, -45, 70, 80, 20, "Save", function()
+		local newBuildName = controls.edit.buf
+		if build.folderName then
+			if copyOnName then
+				main:CopyFolder(build.fullFileName, main.buildPath..build.subPath..newBuildName)
+			else
+				local res, msg = os.rename(build.fullFileName, main.buildPath..build.subPath..newBuildName)
+				if not res then
+					main:OpenMessagePopup("Error", "Couldn't rename '"..build.fullFileName.."' to '"..newBuildName.."': "..msg)
+					return
+				end
+			end
+			self.listMode:BuildList()
+		else
+			local newFileName = newBuildName..".xml"
+			if copyOnName then
+				local res, msg = copyFile(build.fullFileName, main.buildPath..build.subPath..newFileName)
+				if not res then
+					main:OpenMessagePopup("Error", "Couldn't copy build: "..msg)
+					return
+				end
+			else
+				local res, msg = os.rename(build.fullFileName, main.buildPath..build.subPath..newFileName)
+				if not res then
+					main:OpenMessagePopup("Error", "Couldn't rename '"..build.fullFileName.."' to '"..newFileName.."': "..msg)
+					return
+				end
+			end
+			self.listMode:BuildList()
+			self:SelByFileName(newFileName)
+		end
+		main:ClosePopup()
+		self.listMode:SelectControl(self)
+	end)
+	controls.save.enabled = false
+	controls.cancel = new("ButtonControl", nil, 45, 70, 80, 20, "Cancel", function()
+		main:ClosePopup()
+		self.listMode:SelectControl(self)
+	end)
+	main:OpenPopup(370, 100, (copyOnName and "Copy " or "Rename ")..(build.folderName and "Folder" or "Build"), controls, "save", "edit")	
+end
+
+function BuildListClass:DeleteBuild(build)
+	if build.folderName then
+		if NewFileSearch(build.fullFileName.."/*") or NewFileSearch(build.fullFileName.."/*", true) then
+			main:OpenMessagePopup("Delete Folder", "The folder is not empty.")
+		else
+			local res, msg = RemoveDir(build.fullFileName)
+			if not res then
+				main:OpenMessagePopup("Error", "Couldn't delete '"..build.fullFileName.."': "..msg)
+				return
+			end
+			self.listMode:BuildList()
+			self.selIndex = nil
+			self.selValue = nil
+		end
+	else
+		main:OpenConfirmPopup("Confirm Delete", "Are you sure you want to delete build:\n"..build.buildName.."\nThis cannot be undone.", "Delete", function()
+			os.remove(build.fullFileName)
+			self.listMode:BuildList()
+			self.selIndex = nil
+			self.selValue = nil
+		end)
 	end
-	return self
+end
+
+function BuildListClass:GetRowValue(column, index, build)
+	if column == 1 then
+		local label
+		if build.folderName then
+			label = ">> " .. build.folderName
+		else
+			label = build.buildName or "?"
+		end
+		if self.cutBuild and self.cutBuild.buildName == build.buildName and self.cutBuild.folderName == build.folderName then
+			return "^xC0B0B0"..label
+		else
+			return label
+		end
+	elseif column == 2 then
+		if build.buildName then
+			return s_format("%sLevel %d %s", 
+				build.className and colorCodes[build.className:upper()] or "^7", 
+				build.level or 1, 
+				(build.ascendClassName ~= "None" and build.ascendClassName) or build.className or "?"
+			)
+		else
+			return ""
+		end
+	end
+end
+
+function BuildListClass:GetDragValue(index, build)
+	return "Build", build
+end
+
+function BuildListClass:CanReceiveDrag(type, build)
+	return type == "Build"
+end
+
+function BuildListClass:ReceiveDrag(type, build, source)
+	if type == "Build" then
+		if self.hoverValue and self.hoverValue.folderName then
+			if build.folderName then
+				main:MoveFolder(build.folderName, main.buildPath..build.subPath, main.buildPath..self.hoverValue.subPath..self.hoverValue.folderName.."/")
+			else
+				os.rename(build.fullFileName, self.listMode:GetDestName(self.listMode.subPath..self.hoverValue.folderName.."/", build.fileName))
+			end
+			self.listMode:BuildList()
+		end
+	end
+end
+
+function BuildListClass:CanDragToValue(index, build, source)
+	return build.folderName and source.selValue ~= build
+end
+
+function BuildListClass:OnSelClick(index, build, doubleClick)
+	if doubleClick then
+		self:LoadBuild(build)
+		self.selDragging = false
+		self.selDragActive = false
+	end
+end
+
+function BuildListClass:OnSelCopy(index, build)
+	self.copyBuild = build
+	self.cutBuild = nil
+end
+
+function BuildListClass:OnSelCut(index, build)
+	self.copyBuild = nil
+	self.cutBuild = build
+end
+
+function BuildListClass:OnSelDelete(index, build)
+	self:DeleteBuild(build)
+end
+
+function BuildListClass:OnSelKeyDown(index, build, key)
+	if key == "RETURN" then
+		self:LoadBuild(build)
+	elseif key == "F2" then
+		self:RenameBuild(build)
+	end	
 end

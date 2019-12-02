@@ -3,10 +3,9 @@
 -- Class: Check Box Control
 -- Basic check box control.
 --
-local launch, main = ...
-
-local CheckBoxClass = common.NewClass("CheckBoxControl", "Control", function(self, anchor, x, y, size, label, changeFunc)
+local CheckBoxClass = newClass("CheckBoxControl", "Control", "TooltipHost", function(self, anchor, x, y, size, label, changeFunc, tooltipText)
 	self.Control(anchor, x, y, size, size)
+	self.TooltipHost(tooltipText)
 	self.label = label
 	self.changeFunc = changeFunc
 end)
@@ -60,14 +59,10 @@ function CheckBoxClass:Draw(viewPort)
 	if label then
 		DrawString(x - 5, y + 2, "RIGHT_X", size - 4, "VAR", label)
 	end
-	if mOver and self.tooltip then
-		local tooltip = self:GetProperty("tooltip")
-		if tooltip then
-			main:AddTooltipLine(16, tooltip)
-			SetDrawLayer(nil, 100)
-			main:DrawTooltip(x, y, size, size, viewPort)
-			SetDrawLayer(nil, 0)
-		end
+	if mOver then
+		SetDrawLayer(nil, 100)
+		self:DrawTooltip(x, y, size, size, viewPort, self.state)
+		SetDrawLayer(nil, 0)
 	end
 end
 
@@ -88,7 +83,9 @@ function CheckBoxClass:OnKeyUp(key)
 	if key == "LEFTBUTTON" then
 		if self:IsMouseOver() then
 			self.state = not self.state
-			self.changeFunc(self.state)
+			if self.changeFunc then
+				self.changeFunc(self.state)
+			end
 		end
 	end
 	self.clicked = false

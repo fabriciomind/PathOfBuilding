@@ -1,13 +1,17 @@
 -- Path of Building
 --
--- Active Strength skills
--- Skill gem data (c) Grinding Gear Games
+-- Intelligence support gems
+-- Skill data (c) Grinding Gear Games
 --
-local gems, mod, flag, skill = ...
+local skills, mod, flag, skill = ...
 
-gems["Added Chaos Damage"] = {
-	chaos = true,
-	intelligence = true,
+skills["SupportAddedChaosDamage"] = {
+	name = "Added Chaos Damage",
+	gemTags = {
+		chaos = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, },
@@ -56,9 +60,13 @@ gems["Added Chaos Damage"] = {
 		[30] = { 485, 728, },
 	},
 }
-gems["Added Lightning Damage"] = {
-	lightning = true,
-	intelligence = true,
+skills["SupportAddedLightningDamage"] = {
+	name = "Added Lightning Damage",
+	gemTags = {
+		lightning = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 1, 10, },
@@ -107,69 +115,79 @@ gems["Added Lightning Damage"] = {
 		[30] = { 47, 897, },
 	},
 }
-gems["Blasphemy"] = {
-	intelligence = true,
+skills["SupportBlasphemy"] = {
+	name = "Blasphemy",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		curse = true,
+		aura = true,
+	},
 	support = true,
-	curse = true,
-	aura = true,
 	color = 3,
 	requireSkillTypes = { 32, },
 	addSkillTypes = { 15, 16, 31, 44, },
 	excludeSkillTypes = { },
 	baseMods = {
 		skill("manaCostOverride", 35), 
+		skill("cooldown", 0.5), 
 		--"curse_apply_as_aura" = ?
 	},
 	qualityMods = {
 		mod("CurseEffect", "INC", 0.5), --"curse_effect_+%" = 0.5
 	},
 	levelMods = {
-		[1] = mod("AreaRadius", "INC", nil, 0, KeywordFlag.Curse), --"curse_area_of_effect_+%"
+		[1] = mod("AreaOfEffect", "INC", nil, 0, KeywordFlag.Curse), --"curse_area_of_effect_+%"
 	},
 	levels = {
 		[1] = { 0, },
-		[2] = { 2, },
-		[3] = { 4, },
-		[4] = { 6, },
-		[5] = { 8, },
-		[6] = { 10, },
-		[7] = { 12, },
-		[8] = { 14, },
-		[9] = { 16, },
-		[10] = { 18, },
-		[11] = { 20, },
-		[12] = { 22, },
-		[13] = { 24, },
-		[14] = { 26, },
-		[15] = { 28, },
-		[16] = { 30, },
-		[17] = { 32, },
-		[18] = { 34, },
-		[19] = { 36, },
-		[20] = { 38, },
-		[21] = { 40, },
-		[22] = { 42, },
-		[23] = { 44, },
-		[24] = { 46, },
-		[25] = { 48, },
-		[26] = { 50, },
-		[27] = { 52, },
-		[28] = { 54, },
-		[29] = { 56, },
-		[30] = { 58, },
+		[2] = { 4, },
+		[3] = { 8, },
+		[4] = { 12, },
+		[5] = { 16, },
+		[6] = { 20, },
+		[7] = { 24, },
+		[8] = { 28, },
+		[9] = { 32, },
+		[10] = { 36, },
+		[11] = { 40, },
+		[12] = { 44, },
+		[13] = { 48, },
+		[14] = { 52, },
+		[15] = { 56, },
+		[16] = { 60, },
+		[17] = { 64, },
+		[18] = { 68, },
+		[19] = { 72, },
+		[20] = { 76, },
+		[21] = { 80, },
+		[22] = { 84, },
+		[23] = { 88, },
+		[24] = { 92, },
+		[25] = { 96, },
+		[26] = { 100, },
+		[27] = { 104, },
+		[28] = { 108, },
+		[29] = { 112, },
+		[30] = { 116, },
 	},
 }
-gems["Cast when Stunned"] = {
-	intelligence = true,
+skills["SupportCastOnStunned"] = {
+	name = "Cast when Stunned",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		spell = true,
+		trigger = true,
+	},
 	support = true,
-	spell = true,
-	trigger = true,
 	color = 3,
 	requireSkillTypes = { 36, },
 	addSkillTypes = { 42, },
-	excludeSkillTypes = { 37, 41, 30, 44, },
+	excludeSkillTypes = { 37, 41, 30, 44, 61, },
 	baseMods = {
-		--"spell_uncastable_if_triggerable" = ?
+		skill("cooldown", 0.25), 
+		skill("triggered", true, { type = "SkillType", skillType = SkillType.TriggerableSpell }), --"spell_uncastable_if_triggerable" = ?
 		skill("showAverage", true), --"base_skill_show_average_damage_instead_of_dps" = ?
 	},
 	qualityMods = {
@@ -211,9 +229,70 @@ gems["Cast when Stunned"] = {
 		[30] = { 79, },
 	},
 }
-gems["Chance to Ignite"] = {
-	fire = true,
-	intelligence = true,
+skills["SupportCastWhileChannelling"] = {
+	name = "Cast while Channelling",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		channelling = true,
+		spell = true,
+	},
+	support = true,
+	color = 3,
+	requireSkillTypes = { 58, 36, },
+	addSkillTypes = { },
+	excludeSkillTypes = { 30, 61, },
+	baseMods = {
+		mod("ManaCost", "MORE", 40), 
+		skill("triggered", true, { type = "SkillType", skillType = SkillType.TriggerableSpell }), --"spell_uncastable_if_triggerable" = ?
+	},
+	qualityMods = {
+		mod("Damage", "INC", 0.5, 0, 0, nil), --"damage_+%" = 0.5
+	},
+	levelMods = {
+		[1] = skill("timeOverride", nil, { type = "SkillType", skillType = SkillType.TriggerableSpell }), --"cast_while_channelling_time_ms"
+		[2] = mod("Damage", "MORE", nil, 0, 0, { type = "SkillType", skillType = SkillType.TriggerableSpell }), --"support_cast_while_channelling_triggered_skill_damage_+%_final"
+	},
+	levels = {
+		[1] = { 0.45, 0, },
+		[2] = { 0.44, 0, },
+		[3] = { 0.44, 1, },
+		[4] = { 0.43, 1, },
+		[5] = { 0.43, 2, },
+		[6] = { 0.42, 2, },
+		[7] = { 0.42, 3, },
+		[8] = { 0.41, 3, },
+		[9] = { 0.41, 4, },
+		[10] = { 0.4, 4, },
+		[11] = { 0.4, 5, },
+		[12] = { 0.39, 5, },
+		[13] = { 0.39, 6, },
+		[14] = { 0.38, 6, },
+		[15] = { 0.38, 7, },
+		[16] = { 0.37, 7, },
+		[17] = { 0.37, 8, },
+		[18] = { 0.36, 8, },
+		[19] = { 0.36, 9, },
+		[20] = { 0.35, 9, },
+		[21] = { 0.35, 10, },
+		[22] = { 0.34, 10, },
+		[23] = { 0.34, 11, },
+		[24] = { 0.33, 11, },
+		[25] = { 0.33, 12, },
+		[26] = { 0.32, 12, },
+		[27] = { 0.32, 13, },
+		[28] = { 0.31, 13, },
+		[29] = { 0.31, 14, },
+		[30] = { 0.3, 14, },
+	},
+}
+skills["SupportChanceToIgnite"] = {
+	name = "Chance to Ignite",
+	gemTags = {
+		fire = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, },
@@ -261,17 +340,21 @@ gems["Chance to Ignite"] = {
 		[30] = { 59, },
 	},
 }
-gems["Concentrated Effect"] = {
-	intelligence = true,
+skills["SupportConcentratedEffect"] = {
+	name = "Concentrated Effect",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		area = true,
+	},
 	support = true,
-	area = true,
 	color = 3,
 	requireSkillTypes = { 11, 21, 53, },
 	addSkillTypes = { },
 	excludeSkillTypes = { },
 	baseMods = {
 		mod("ManaCost", "MORE", 40), 
-		mod("AreaRadius", "MORE", -25), --"support_concentrated_effect_skill_area_of_effect_+%_final" = -25
+		mod("AreaOfEffect", "MORE", -30), --"support_concentrated_effect_skill_area_of_effect_+%_final" = -30
 	},
 	qualityMods = {
 		mod("Damage", "INC", 0.5, ModFlag.Area), --"area_damage_+%" = 0.5
@@ -280,41 +363,45 @@ gems["Concentrated Effect"] = {
 		[1] = mod("Damage", "MORE", nil, ModFlag.Area), --"support_area_concentrate_area_damage_+%_final"
 	},
 	levels = {
-		[1] = { 40, },
-		[2] = { 41, },
-		[3] = { 42, },
-		[4] = { 43, },
-		[5] = { 44, },
-		[6] = { 45, },
-		[7] = { 46, },
-		[8] = { 47, },
-		[9] = { 48, },
-		[10] = { 49, },
-		[11] = { 50, },
-		[12] = { 51, },
-		[13] = { 52, },
-		[14] = { 53, },
-		[15] = { 54, },
-		[16] = { 55, },
-		[17] = { 56, },
-		[18] = { 57, },
-		[19] = { 58, },
-		[20] = { 59, },
-		[21] = { 60, },
-		[22] = { 61, },
-		[23] = { 62, },
-		[24] = { 63, },
-		[25] = { 64, },
-		[26] = { 65, },
-		[27] = { 66, },
-		[28] = { 67, },
-		[29] = { 68, },
-		[30] = { 69, },
+		[1] = { 35, },
+		[2] = { 36, },
+		[3] = { 37, },
+		[4] = { 38, },
+		[5] = { 39, },
+		[6] = { 40, },
+		[7] = { 41, },
+		[8] = { 42, },
+		[9] = { 43, },
+		[10] = { 44, },
+		[11] = { 45, },
+		[12] = { 46, },
+		[13] = { 47, },
+		[14] = { 48, },
+		[15] = { 49, },
+		[16] = { 50, },
+		[17] = { 51, },
+		[18] = { 52, },
+		[19] = { 53, },
+		[20] = { 54, },
+		[21] = { 55, },
+		[22] = { 56, },
+		[23] = { 57, },
+		[24] = { 58, },
+		[25] = { 59, },
+		[26] = { 60, },
+		[27] = { 61, },
+		[28] = { 62, },
+		[29] = { 63, },
+		[30] = { 64, },
 	},
 }
-gems["Controlled Destruction"] = {
-	spell = true,
-	intelligence = true,
+skills["SupportControlledDestruction"] = {
+	name = "Controlled Destruction",
+	gemTags = {
+		spell = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, 59, },
@@ -322,7 +409,7 @@ gems["Controlled Destruction"] = {
 	excludeSkillTypes = { },
 	baseMods = {
 		mod("ManaCost", "MORE", 30), 
-		mod("CritChance", "INC", -100), --"critical_strike_chance_+%" = -100
+		mod("CritChance", "INC", -100, 0, 0, nil), --"critical_strike_chance_+%" = -100
 	},
 	qualityMods = {
 		mod("Damage", "INC", 0.5, ModFlag.Spell, 0, nil), --"spell_damage_+%" = 0.5
@@ -363,10 +450,14 @@ gems["Controlled Destruction"] = {
 		[30] = { 54, },
 	},
 }
-gems["Curse On Hit"] = {
-	curse = true,
-	trigger = true,
-	intelligence = true,
+skills["SupportCurseOnHit"] = {
+	name = "Curse On Hit",
+	gemTags = {
+		curse = true,
+		trigger = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 1, 10, 32, },
@@ -415,8 +506,12 @@ gems["Curse On Hit"] = {
 		[30] = { 8, },
 	},
 }
-gems["Elemental Focus"] = {
-	intelligence = true,
+skills["SupportElementalFocus"] = {
+	name = "Elemental Focus",
+	gemTags = {
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, 29, },
@@ -469,13 +564,17 @@ gems["Elemental Focus"] = {
 		[30] = { 59, },
 	},
 }
-gems["Elemental Proliferation"] = {
-	cold = true,
-	fire = true,
-	lightning = true,
-	intelligence = true,
+skills["SupportElementalProliferation"] = {
+	name = "Elemental Proliferation",
+	gemTags = {
+		cold = true,
+		fire = true,
+		lightning = true,
+		intelligence = true,
+		support = true,
+		area = true,
+	},
 	support = true,
-	area = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, 20, },
 	addSkillTypes = { 11, },
@@ -527,9 +626,13 @@ gems["Elemental Proliferation"] = {
 		[30] = { -16, },
 	},
 }
-gems["Enlighten"] = {
-	low_max_level = true,
-	intelligence = true,
+skills["SupportAdditionalXP"] = {
+	name = "Enlighten",
+	gemTags = {
+		low_max_level = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { },
@@ -556,10 +659,14 @@ gems["Enlighten"] = {
 		[10] = { -36, },
 	},
 }
-gems["Faster Casting"] = {
-	intelligence = true,
+skills["SupportFasterCast"] = {
+	name = "Faster Casting",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		spell = true,
+	},
 	support = true,
-	spell = true,
 	color = 3,
 	requireSkillTypes = { 2, 39, },
 	addSkillTypes = { },
@@ -568,10 +675,10 @@ gems["Faster Casting"] = {
 		mod("ManaCost", "MORE", 20), 
 	},
 	qualityMods = {
-		mod("Speed", "INC", 0.5, ModFlag.Spell), --"base_cast_speed_+%" = 0.5
+		mod("Speed", "INC", 0.5, ModFlag.Cast), --"base_cast_speed_+%" = 0.5
 	},
 	levelMods = {
-		[1] = mod("Speed", "INC", nil, ModFlag.Spell), --"base_cast_speed_+%"
+		[1] = mod("Speed", "INC", nil, ModFlag.Cast), --"base_cast_speed_+%"
 	},
 	levels = {
 		[1] = { 20, },
@@ -606,10 +713,14 @@ gems["Faster Casting"] = {
 		[30] = { 49, },
 	},
 }
-gems["Increased Area of Effect"] = {
-	intelligence = true,
+skills["SupportIncreasedAreaOfEffect"] = {
+	name = "Increased Area of Effect",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		area = true,
+	},
 	support = true,
-	area = true,
 	color = 3,
 	requireSkillTypes = { 11, 21, 53, },
 	addSkillTypes = { },
@@ -621,43 +732,47 @@ gems["Increased Area of Effect"] = {
 		mod("Damage", "INC", 0.5, ModFlag.Area), --"area_damage_+%" = 0.5
 	},
 	levelMods = {
-		[1] = mod("AreaRadius", "INC", nil), --"base_skill_area_of_effect_+%"
+		[1] = mod("AreaOfEffect", "INC", nil), --"base_skill_area_of_effect_+%"
 	},
 	levels = {
-		[1] = { 20, },
-		[2] = { 21, },
-		[3] = { 22, },
-		[4] = { 23, },
-		[5] = { 24, },
-		[6] = { 25, },
-		[7] = { 26, },
-		[8] = { 27, },
-		[9] = { 28, },
-		[10] = { 29, },
-		[11] = { 30, },
-		[12] = { 31, },
-		[13] = { 32, },
-		[14] = { 33, },
-		[15] = { 34, },
-		[16] = { 35, },
-		[17] = { 36, },
-		[18] = { 37, },
-		[19] = { 38, },
-		[20] = { 39, },
-		[21] = { 40, },
-		[22] = { 41, },
-		[23] = { 42, },
-		[24] = { 43, },
-		[25] = { 44, },
-		[26] = { 45, },
-		[27] = { 46, },
-		[28] = { 47, },
-		[29] = { 48, },
-		[30] = { 49, },
+		[1] = { 30, },
+		[2] = { 31, },
+		[3] = { 32, },
+		[4] = { 33, },
+		[5] = { 34, },
+		[6] = { 35, },
+		[7] = { 36, },
+		[8] = { 37, },
+		[9] = { 38, },
+		[10] = { 39, },
+		[11] = { 40, },
+		[12] = { 41, },
+		[13] = { 42, },
+		[14] = { 43, },
+		[15] = { 44, },
+		[16] = { 45, },
+		[17] = { 46, },
+		[18] = { 47, },
+		[19] = { 48, },
+		[20] = { 49, },
+		[21] = { 50, },
+		[22] = { 51, },
+		[23] = { 52, },
+		[24] = { 53, },
+		[25] = { 54, },
+		[26] = { 55, },
+		[27] = { 56, },
+		[28] = { 57, },
+		[29] = { 58, },
+		[30] = { 59, },
 	},
 }
-gems["Increased Critical Damage"] = {
-	intelligence = true,
+skills["SupportIncreasedCriticalDamage"] = {
+	name = "Increased Critical Damage",
+	gemTags = {
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, },
@@ -667,10 +782,10 @@ gems["Increased Critical Damage"] = {
 		mod("ManaCost", "MORE", 30), 
 	},
 	qualityMods = {
-		mod("CritMultiplier", "BASE", 0.75), --"base_critical_strike_multiplier_+" = 0.75
+		mod("CritMultiplier", "BASE", 0.75, 0, 0, nil), --"base_critical_strike_multiplier_+" = 0.75
 	},
 	levelMods = {
-		[1] = mod("CritMultiplier", "BASE", nil), --"base_critical_strike_multiplier_+"
+		[1] = mod("CritMultiplier", "BASE", nil, 0, 0, nil), --"base_critical_strike_multiplier_+"
 	},
 	levels = {
 		[1] = { 75, },
@@ -705,8 +820,12 @@ gems["Increased Critical Damage"] = {
 		[30] = { 118, },
 	},
 }
-gems["Increased Critical Strikes"] = {
-	intelligence = true,
+skills["SupportIncreasedCriticalStrikes"] = {
+	name = "Increased Critical Strikes",
+	gemTags = {
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, },
@@ -716,11 +835,11 @@ gems["Increased Critical Strikes"] = {
 		mod("ManaCost", "MORE", 15), 
 	},
 	qualityMods = {
-		mod("CritChance", "INC", 1), --"critical_strike_chance_+%" = 1
+		mod("CritChance", "INC", 1, 0, 0, nil), --"critical_strike_chance_+%" = 1
 	},
 	levelMods = {
-		[1] = mod("CritChance", "INC", nil), --"critical_strike_chance_+%"
-		[2] = mod("CritChance", "BASE", nil), --"additional_base_critical_strike_chance"
+		[1] = mod("CritChance", "INC", nil, 0, 0, nil), --"critical_strike_chance_+%"
+		[2] = mod("CritChance", "BASE", nil, 0, 0, nil), --"additional_base_critical_strike_chance"
 	},
 	levels = {
 		[1] = { 50, 1, },
@@ -755,9 +874,13 @@ gems["Increased Critical Strikes"] = {
 		[30] = { 108, 2.4, },
 	},
 }
-gems["Innervate"] = {
-	lightning = true,
-	intelligence = true,
+skills["SupportOnslaughtOnSlayingShockedEnemy"] = {
+	name = "Innervate",
+	gemTags = {
+		lightning = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, },
@@ -806,8 +929,12 @@ gems["Innervate"] = {
 		[30] = { 7900, },
 	},
 }
-gems["Item Rarity"] = {
-	intelligence = true,
+skills["SupportItemRarity"] = {
+	name = "Item Rarity",
+	gemTags = {
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, 40, },
@@ -854,9 +981,13 @@ gems["Item Rarity"] = {
 		[30] = { 69, },
 	},
 }
-gems["Lightning Penetration"] = {
-	lightning = true,
-	intelligence = true,
+skills["SupportLightningPenetration"] = {
+	name = "Lightning Penetration",
+	gemTags = {
+		lightning = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, },
@@ -904,10 +1035,14 @@ gems["Lightning Penetration"] = {
 		[30] = { 47, },
 	},
 }
-gems["Minefield"] = {
-	intelligence = true,
+skills["SupportMinefield"] = {
+	name = "Minefield",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		mine = true,
+	},
 	support = true,
-	mine = true,
 	color = 3,
 	requireSkillTypes = { 41, },
 	addSkillTypes = { },
@@ -918,7 +1053,7 @@ gems["Minefield"] = {
 		mod("ActiveMineLimit", "BASE", 2), --"number_of_additional_remote_mines_allowed" = 2
 	},
 	qualityMods = {
-		mod("MineDetonationRadius", "INC", 1), --"mine_detonation_radius_+%" = 1
+		mod("MineDetonationAreaOfEffect", "INC", 1), --"mine_detonation_radius_+%" = 1
 	},
 	levelMods = {
 		[1] = mod("Damage", "MORE", nil), --"support_minefield_mine_damage_+%_final"
@@ -956,34 +1091,237 @@ gems["Minefield"] = {
 		[30] = { -11, },
 	},
 }
-gems["Minion Damage"] = {
-	intelligence = true,
+skills["SupportMinionDamage"] = {
+	name = "Minion Damage",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		minion = true,
+	},
 	support = true,
-	minion = true,
-	unsupported = true,
+	color = 3,
+	requireSkillTypes = { 9, },
+	addSkillTypes = { },
+	excludeSkillTypes = { },
+	baseMods = {
+		mod("ManaCost", "MORE", 30), 
+	},
+	qualityMods = {
+		mod("Misc", "LIST", { type = "MinionModifier", mod = mod("Damage", "INC", 0.75) }), --"minion_damage_+%" = 0.75
+	},
+	levelMods = {
+		[1] = mod("Misc", "LIST", { type = "MinionModifier", mod = mod("Damage", "MORE", nil) }), --"support_minion_damage_+%_final"
+	},
+	levels = {
+		[1] = { 30, },
+		[2] = { 31, },
+		[3] = { 32, },
+		[4] = { 33, },
+		[5] = { 34, },
+		[6] = { 35, },
+		[7] = { 36, },
+		[8] = { 37, },
+		[9] = { 38, },
+		[10] = { 39, },
+		[11] = { 40, },
+		[12] = { 41, },
+		[13] = { 42, },
+		[14] = { 43, },
+		[15] = { 44, },
+		[16] = { 45, },
+		[17] = { 46, },
+		[18] = { 47, },
+		[19] = { 48, },
+		[20] = { 49, },
+		[21] = { 50, },
+		[22] = { 51, },
+		[23] = { 52, },
+		[24] = { 53, },
+		[25] = { 54, },
+		[26] = { 55, },
+		[27] = { 56, },
+		[28] = { 57, },
+		[29] = { 58, },
+		[30] = { 59, },
+	},
 }
-gems["Minion Life"] = {
-	intelligence = true,
+skills["SupportMinionLife"] = {
+	name = "Minion Life",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		minion = true,
+	},
 	support = true,
-	minion = true,
-	unsupported = true,
+	color = 3,
+	requireSkillTypes = { 9, },
+	addSkillTypes = { },
+	excludeSkillTypes = { },
+	baseMods = {
+		mod("ManaCost", "MORE", 40), 
+	},
+	qualityMods = {
+		mod("Misc", "LIST", { type = "MinionModifier", mod = mod("Life", "INC", 0.75) }), --"minion_maximum_life_+%" = 0.75
+	},
+	levelMods = {
+		[1] = mod("Misc", "LIST", { type = "MinionModifier", mod = mod("Life", "INC", nil) }), --"minion_maximum_life_+%"
+	},
+	levels = {
+		[1] = { 30, },
+		[2] = { 31, },
+		[3] = { 32, },
+		[4] = { 33, },
+		[5] = { 34, },
+		[6] = { 35, },
+		[7] = { 36, },
+		[8] = { 37, },
+		[9] = { 38, },
+		[10] = { 39, },
+		[11] = { 40, },
+		[12] = { 41, },
+		[13] = { 42, },
+		[14] = { 43, },
+		[15] = { 44, },
+		[16] = { 45, },
+		[17] = { 46, },
+		[18] = { 47, },
+		[19] = { 48, },
+		[20] = { 49, },
+		[21] = { 50, },
+		[22] = { 51, },
+		[23] = { 52, },
+		[24] = { 53, },
+		[25] = { 54, },
+		[26] = { 55, },
+		[27] = { 56, },
+		[28] = { 57, },
+		[29] = { 58, },
+		[30] = { 59, },
+	},
 }
-gems["Minion Speed"] = {
-	movement = true,
-	intelligence = true,
+skills["SupportMinionSpeed"] = {
+	name = "Minion Speed",
+	gemTags = {
+		movement = true,
+		intelligence = true,
+		support = true,
+		minion = true,
+	},
 	support = true,
-	minion = true,
-	unsupported = true,
+	color = 3,
+	requireSkillTypes = { 9, },
+	addSkillTypes = { },
+	excludeSkillTypes = { },
+	baseMods = {
+		mod("ManaCost", "MORE", 40), 
+	},
+	qualityMods = {
+		mod("Misc", "LIST", { type = "MinionModifier", mod = mod("MovementSpeed", "INC", 0.5) }), --"minion_movement_speed_+%" = 0.5
+	},
+	levelMods = {
+		[1] = mod("Misc", "LIST", { type = "MinionModifier", mod = mod("MovementSpeed", "INC", nil) }), --"minion_movement_speed_+%"
+		[2] = mod("Misc", "LIST", { type = "MinionModifier", mod = mod("Speed", "INC", nil, ModFlag.Attack) }), --"minion_attack_speed_+%"
+		[3] = mod("Misc", "LIST", { type = "MinionModifier", mod = mod("Speed", "INC", nil, ModFlag.Cast) }), --"minion_cast_speed_+%"
+	},
+	levels = {
+		[1] = { 25, 10, 10, },
+		[2] = { 26, 10, 10, },
+		[3] = { 27, 11, 11, },
+		[4] = { 28, 11, 11, },
+		[5] = { 29, 12, 12, },
+		[6] = { 30, 12, 12, },
+		[7] = { 31, 13, 13, },
+		[8] = { 32, 13, 13, },
+		[9] = { 33, 14, 14, },
+		[10] = { 34, 14, 14, },
+		[11] = { 35, 15, 15, },
+		[12] = { 36, 15, 15, },
+		[13] = { 37, 16, 16, },
+		[14] = { 38, 16, 16, },
+		[15] = { 39, 17, 17, },
+		[16] = { 40, 17, 17, },
+		[17] = { 41, 18, 18, },
+		[18] = { 42, 18, 18, },
+		[19] = { 43, 19, 19, },
+		[20] = { 44, 19, 19, },
+		[21] = { 45, 20, 20, },
+		[22] = { 46, 20, 20, },
+		[23] = { 47, 21, 21, },
+		[24] = { 48, 21, 21, },
+		[25] = { 49, 22, 22, },
+		[26] = { 50, 22, 22, },
+		[27] = { 51, 23, 23, },
+		[28] = { 52, 23, 23, },
+		[29] = { 53, 24, 24, },
+		[30] = { 54, 24, 24, },
+	},
 }
-gems["Minion and Totem Elemental Resistance"] = {
-	intelligence = true,
+skills["SupportSummonElementalResistances"] = {
+	name = "Minion and Totem Elemental Resistance",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		minion = true,
+	},
 	support = true,
-	minion = true,
-	unsupported = true,
+	color = 3,
+	requireSkillTypes = { 9, 30, },
+	addSkillTypes = { },
+	excludeSkillTypes = { },
+	baseMods = {
+		mod("ManaCost", "MORE", 40), 
+	},
+	qualityMods = {
+		--"summon_fire_resistance_+" = 0.5
+		--"summon_cold_resistance_+" = 0.5
+		--"summon_lightning_resistance_+" = 0.5
+	},
+	levelMods = {
+		--[1] = "summon_fire_resistance_+"
+		--[2] = "summon_cold_resistance_+"
+		--[3] = "summon_lightning_resistance_+"
+		[4] = { mod("ElementalDamage", "MORE", nil, 0, KeywordFlag.Totem), mod("Misc", "LIST", { type = "MinionModifier", mod = mod("ElementalDamage", "MORE", nil) }) }, --"support_minion_totem_resistance_elemental_damage_+%_final"
+	},
+	levels = {
+		[1] = { 25, 25, 25, 10, },
+		[2] = { 26, 26, 26, 10, },
+		[3] = { 27, 27, 27, 11, },
+		[4] = { 28, 28, 28, 11, },
+		[5] = { 29, 29, 29, 12, },
+		[6] = { 30, 30, 30, 12, },
+		[7] = { 31, 31, 31, 13, },
+		[8] = { 32, 32, 32, 13, },
+		[9] = { 33, 33, 33, 14, },
+		[10] = { 34, 34, 34, 14, },
+		[11] = { 35, 35, 35, 15, },
+		[12] = { 36, 36, 36, 15, },
+		[13] = { 37, 37, 37, 16, },
+		[14] = { 38, 38, 38, 16, },
+		[15] = { 39, 39, 39, 17, },
+		[16] = { 40, 40, 40, 17, },
+		[17] = { 41, 41, 41, 18, },
+		[18] = { 42, 42, 42, 18, },
+		[19] = { 43, 43, 43, 19, },
+		[20] = { 44, 44, 44, 19, },
+		[21] = { 45, 45, 45, 20, },
+		[22] = { 46, 46, 46, 20, },
+		[23] = { 47, 47, 47, 21, },
+		[24] = { 48, 48, 48, 21, },
+		[25] = { 49, 49, 49, 22, },
+		[26] = { 50, 50, 50, 22, },
+		[27] = { 51, 51, 51, 23, },
+		[28] = { 52, 52, 52, 23, },
+		[29] = { 53, 53, 53, 24, },
+		[30] = { 54, 54, 54, 24, },
+	},
 }
-gems["Physical to Lightning"] = {
-	lightning = true,
-	intelligence = true,
+skills["SupportPhysicalToLightning"] = {
+	name = "Physical to Lightning",
+	gemTags = {
+		lightning = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, },
@@ -991,7 +1329,7 @@ gems["Physical to Lightning"] = {
 	excludeSkillTypes = { },
 	baseMods = {
 		mod("ManaCost", "MORE", 10), 
-		skill("PhysicalDamageConvertToLightning", 50), --"skill_physical_damage_%_to_convert_to_lightning" = 50
+		mod("SkillPhysicalDamageConvertToLightning", "BASE", 50), --"skill_physical_damage_%_to_convert_to_lightning" = 50
 	},
 	qualityMods = {
 		mod("PhysicalDamage", "INC", 0.5), --"physical_damage_+%" = 0.5
@@ -1033,8 +1371,12 @@ gems["Physical to Lightning"] = {
 		[30] = { 39, },
 	},
 }
-gems["Power Charge On Critical"] = {
-	intelligence = true,
+skills["SupportPowerChargeOnCrit"] = {
+	name = "Power Charge On Critical",
+	gemTags = {
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 10, 1, },
@@ -1044,7 +1386,7 @@ gems["Power Charge On Critical"] = {
 		mod("ManaCost", "MORE", 10), 
 	},
 	qualityMods = {
-		mod("CritChance", "INC", 1), --"critical_strike_chance_+%" = 1
+		mod("CritChance", "INC", 1, 0, 0, nil), --"critical_strike_chance_+%" = 1
 	},
 	levelMods = {
 		--[1] = "add_power_charge_on_critical_strike_%"
@@ -1082,11 +1424,15 @@ gems["Power Charge On Critical"] = {
 		[30] = { 64, },
 	},
 }
-gems["Remote Mine"] = {
-	intelligence = true,
+skills["SupportRemoteMine"] = {
+	name = "Remote Mine",
+	gemTags = {
+		intelligence = true,
+		support = true,
+		mine = true,
+		duration = true,
+	},
 	support = true,
-	mine = true,
-	duration = true,
 	addFlags = {
 		mine = true,
 		duration = true,
@@ -1094,7 +1440,7 @@ gems["Remote Mine"] = {
 	color = 3,
 	requireSkillTypes = { 19, },
 	addSkillTypes = { 12, 41, },
-	excludeSkillTypes = { },
+	excludeSkillTypes = { 61, },
 	baseMods = {
 		mod("ManaCost", "MORE", 50), 
 		--"is_remote_mine" = 1
@@ -1143,9 +1489,13 @@ gems["Remote Mine"] = {
 		[30] = { 59, },
 	},
 }
-gems["Spell Echo"] = {
-	spell = true,
-	intelligence = true,
+skills["SupportMulticast"] = {
+	name = "Spell Echo",
+	gemTags = {
+		spell = true,
+		intelligence = true,
+		support = true,
+	},
 	support = true,
 	color = 3,
 	requireSkillTypes = { 26, },
@@ -1153,14 +1503,14 @@ gems["Spell Echo"] = {
 	excludeSkillTypes = { 30, 37, 41, 42, 15, },
 	baseMods = {
 		mod("ManaCost", "MORE", 40), 
-		--"base_spell_repeat_count" = 1
+		skill("repeatCount", 1), --"base_spell_repeat_count" = 1
 		mod("Damage", "MORE", -10), --"support_echo_damage_+%_final" = -10
 	},
 	qualityMods = {
 		mod("Damage", "INC", 0.5, ModFlag.Spell, 0, nil), --"spell_damage_+%" = 0.5
 	},
 	levelMods = {
-		[1] = mod("Speed", "MORE", nil, ModFlag.Spell), --"support_multicast_cast_speed_+%_final"
+		[1] = mod("Speed", "MORE", nil, ModFlag.Cast), --"support_multicast_cast_speed_+%_final"
 	},
 	levels = {
 		[1] = { 51, },

@@ -1,13 +1,17 @@
 -- Path of Building
 --
--- Active Strength skills
--- Skill gem data (c) Grinding Gear Games
+-- Dexterity support gems
+-- Skill data (c) Grinding Gear Games
 --
-local gems, mod, flag, skill = ...
+local skills, mod, flag, skill = ...
 
-gems["Added Cold Damage"] = {
-	cold = true,
-	dexterity = true,
+skills["SupportAddedColdDamage"] = {
+	name = "Added Cold Damage",
+	gemTags = {
+		cold = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 1, 10, },
@@ -56,9 +60,13 @@ gems["Added Cold Damage"] = {
 		[30] = { 298, 447, },
 	},
 }
-gems["Additional Accuracy"] = {
-	attack = true,
-	dexterity = true,
+skills["SupportAdditionalAccuracy"] = {
+	name = "Additional Accuracy",
+	gemTags = {
+		attack = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 1, 56, },
@@ -67,10 +75,10 @@ gems["Additional Accuracy"] = {
 	baseMods = {
 	},
 	qualityMods = {
-		mod("Accuracy", "INC", 1), --"accuracy_rating_+%" = 1
+		mod("Accuracy", "INC", 1, 0, 0, nil), --"accuracy_rating_+%" = 1
 	},
 	levelMods = {
-		[1] = mod("Accuracy", "BASE", nil), --"accuracy_rating"
+		[1] = mod("Accuracy", "BASE", nil, 0, 0, nil), --"accuracy_rating"
 	},
 	levels = {
 		[1] = { 74, },
@@ -105,8 +113,12 @@ gems["Additional Accuracy"] = {
 		[30] = { 1594, },
 	},
 }
-gems["Blind"] = {
-	dexterity = true,
+skills["SupportBlind"] = {
+	name = "Blind",
+	gemTags = {
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 10, 1, },
@@ -154,35 +166,139 @@ gems["Blind"] = {
 		[30] = { 58, },
 	},
 }
-gems["Block Chance Reduction"] = {
-	dexterity = true,
+skills["SupportBlockReduction"] = {
+	name = "Block Chance Reduction",
+	gemTags = {
+		dexterity = true,
+		support = true,
+	},
 	support = true,
-	unsupported = true,
+	color = 2,
+	requireSkillTypes = { 10, 1, },
+	addSkillTypes = { },
+	excludeSkillTypes = { },
+	baseMods = {
+	},
+	qualityMods = {
+		--"global_reduce_enemy_block_%" = 0.25
+	},
+	levelMods = {
+		--[1] = "global_reduce_enemy_block_%"
+		--[2] = "reduce_enemy_dodge_%"
+	},
+	levels = {
+		[1] = { 20, 20, },
+		[2] = { 21, 20, },
+		[3] = { 21, 21, },
+		[4] = { 22, 21, },
+		[5] = { 22, 22, },
+		[6] = { 23, 22, },
+		[7] = { 23, 23, },
+		[8] = { 24, 23, },
+		[9] = { 24, 24, },
+		[10] = { 25, 24, },
+		[11] = { 25, 25, },
+		[12] = { 26, 25, },
+		[13] = { 26, 26, },
+		[14] = { 27, 26, },
+		[15] = { 27, 27, },
+		[16] = { 28, 27, },
+		[17] = { 28, 28, },
+		[18] = { 29, 28, },
+		[19] = { 29, 29, },
+		[20] = { 30, 29, },
+		[21] = { 30, 30, },
+		[22] = { 31, 30, },
+		[23] = { 31, 31, },
+		[24] = { 32, 31, },
+		[25] = { 32, 32, },
+		[26] = { 33, 32, },
+		[27] = { 33, 33, },
+		[28] = { 34, 33, },
+		[29] = { 34, 34, },
+		[30] = { 35, 34, },
+	},
 }
-gems["Cast On Critical Strike"] = {
-	dexterity = true,
+skills["SupportCastOnCrit"] = {
+	name = "Cast On Critical Strike",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		spell = true,
+		trigger = true,
+	},
 	support = true,
-	spell = true,
-	trigger = true,
-	unsupported = true,
+	color = 2,
+	requireSkillTypes = { 1, 36, },
+	addSkillTypes = { 42, },
+	excludeSkillTypes = { 37, 41, 30, 44, 61, },
+	baseMods = {
+		mod("ManaCost", "MORE", 40), 
+		skill("cooldown", 0.5), 
+		--"cast_linked_spells_on_attack_crit_%" = 100
+		skill("triggered", true, { type = "SkillType", skillType = SkillType.TriggerableSpell }), --"spell_uncastable_if_triggerable" = ?
+		skill("showAverage", true, { type = "SkillType", skillType = 36 }), 
+	},
+	qualityMods = {
+		mod("CritChance", "INC", 1, 0, 0, nil), --"critical_strike_chance_+%" = 1
+	},
+	levelMods = {
+		[1] = mod("Damage", "MORE", nil, ModFlag.Spell), --"support_cast_on_crit_spell_damage_+%_final"
+	},
+	levels = {
+		[1] = { 20, },
+		[2] = { 21, },
+		[3] = { 22, },
+		[4] = { 23, },
+		[5] = { 24, },
+		[6] = { 25, },
+		[7] = { 26, },
+		[8] = { 27, },
+		[9] = { 28, },
+		[10] = { 29, },
+		[11] = { 30, },
+		[12] = { 31, },
+		[13] = { 32, },
+		[14] = { 33, },
+		[15] = { 34, },
+		[16] = { 35, },
+		[17] = { 36, },
+		[18] = { 37, },
+		[19] = { 38, },
+		[20] = { 39, },
+		[21] = { 40, },
+		[22] = { 41, },
+		[23] = { 42, },
+		[24] = { 43, },
+		[25] = { 44, },
+		[26] = { 45, },
+		[27] = { 46, },
+		[28] = { 47, },
+		[29] = { 48, },
+		[30] = { 49, },
+	},
 }
-gems["Cast on Death"] = {
-	dexterity = true,
+skills["SupportCastOnDeath"] = {
+	name = "Cast on Death",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		spell = true,
+		trigger = true,
+	},
 	support = true,
-	spell = true,
-	trigger = true,
 	color = 2,
 	requireSkillTypes = { 36, },
 	addSkillTypes = { 42, },
-	excludeSkillTypes = { 9, 37, 41, 30, 44, },
+	excludeSkillTypes = { 9, 37, 41, 30, 44, 61, },
 	baseMods = {
 		--"cast_on_death_%" = 100
-		--"spell_uncastable_if_triggerable" = ?
+		skill("triggered", true, { type = "SkillType", skillType = SkillType.TriggerableSpell }), --"spell_uncastable_if_triggerable" = ?
 		--"spell_only_castable_on_death" = ?
 		skill("showAverage", true), --"base_skill_show_average_damage_instead_of_dps" = ?
 	},
 	qualityMods = {
-		mod("AreaRadius", "INC", 3), --"area_of_effect_+%_while_dead" = 3
+		mod("AreaOfEffect", "INC", 3), --"area_of_effect_+%_while_dead" = 3
 	},
 	levelMods = {
 		[1] = mod("Damage", "MORE", nil), --"cast_on_death_damage_+%_final_while_dead"
@@ -220,11 +336,15 @@ gems["Cast on Death"] = {
 		[30] = { 464, },
 	},
 }
-gems["Chain"] = {
-	dexterity = true,
+skills["SupportChain"] = {
+	name = "Chain",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		chaining = true,
+		projectile = true,
+	},
 	support = true,
-	chaining = true,
-	projectile = true,
 	color = 2,
 	requireSkillTypes = { 23, 3, 54, 56, },
 	addSkillTypes = { },
@@ -272,8 +392,12 @@ gems["Chain"] = {
 		[30] = { -21, },
 	},
 }
-gems["Chance to Flee"] = {
-	dexterity = true,
+skills["SupportChanceToFlee"] = {
+	name = "Chance to Flee",
+	gemTags = {
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 1, 10, },
@@ -320,9 +444,13 @@ gems["Chance to Flee"] = {
 		[30] = { 54, },
 	},
 }
-gems["Cluster Traps"] = {
-	trap = true,
-	dexterity = true,
+skills["SupportClusterTrap"] = {
+	name = "Cluster Traps",
+	gemTags = {
+		trap = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 37, },
@@ -373,9 +501,13 @@ gems["Cluster Traps"] = {
 		[30] = { -26, },
 	},
 }
-gems["Cold Penetration"] = {
-	cold = true,
-	dexterity = true,
+skills["SupportColdPenetration"] = {
+	name = "Cold Penetration",
+	gemTags = {
+		cold = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 10, 1, },
@@ -423,8 +555,12 @@ gems["Cold Penetration"] = {
 		[30] = { 47, },
 	},
 }
-gems["Culling Strike"] = {
-	dexterity = true,
+skills["SupportCullingStrike"] = {
+	name = "Culling Strike",
+	gemTags = {
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 10, 1, },
@@ -434,11 +570,11 @@ gems["Culling Strike"] = {
 		mod("ManaCost", "MORE", 10), 
 		--"kill_enemy_on_hit_if_under_10%_life" = 1
 		mod("Speed", "INC", 0, ModFlag.Attack, 0, nil), --"attack_speed_+%" = 0
-		mod("Speed", "INC", 0, ModFlag.Spell), --"base_cast_speed_+%" = 0
+		mod("Speed", "INC", 0, ModFlag.Cast), --"base_cast_speed_+%" = 0
 	},
 	qualityMods = {
 		mod("Speed", "INC", 0.5, ModFlag.Attack, 0, nil), --"attack_speed_+%" = 0.5
-		mod("Speed", "INC", 0.5, ModFlag.Spell), --"base_cast_speed_+%" = 0.5
+		mod("Speed", "INC", 0.5, ModFlag.Cast), --"base_cast_speed_+%" = 0.5
 	},
 	levelMods = {
 		[1] = mod("Damage", "INC", nil, 0, 0, nil), --"damage_+%"
@@ -476,9 +612,13 @@ gems["Culling Strike"] = {
 		[30] = { 58, },
 	},
 }
-gems["Enhance"] = {
-	low_max_level = true,
-	dexterity = true,
+skills["SupportAdditionalQuality"] = {
+	name = "Enhance",
+	gemTags = {
+		low_max_level = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { },
@@ -491,7 +631,7 @@ gems["Enhance"] = {
 		--"local_gem_experience_gain_+%" = 5
 	},
 	levelMods = {
-		[1] = mod("GemProperty", "LIST", { keyword = "active", key = "quality", value = nil }), --"supported_active_skill_gem_quality_%"
+		[1] = mod("GemProperty", "LIST", { keyword = "active_skill", key = "quality", value = nil }), --"supported_active_skill_gem_quality_%"
 	},
 	levels = {
 		[1] = { 0, },
@@ -506,9 +646,13 @@ gems["Enhance"] = {
 		[10] = { 72, },
 	},
 }
-gems["Faster Attacks"] = {
-	attack = true,
-	dexterity = true,
+skills["SupportFasterAttack"] = {
+	name = "Faster Attacks",
+	gemTags = {
+		attack = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 1, 56, },
@@ -556,10 +700,14 @@ gems["Faster Attacks"] = {
 		[30] = { 54, },
 	},
 }
-gems["Faster Projectiles"] = {
-	dexterity = true,
+skills["SupportFasterProjectiles"] = {
+	name = "Faster Projectiles",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		projectile = true,
+	},
 	support = true,
-	projectile = true,
 	color = 2,
 	requireSkillTypes = { 3, 14, 54, 56, },
 	addSkillTypes = { },
@@ -569,7 +717,7 @@ gems["Faster Projectiles"] = {
 	},
 	qualityMods = {
 		mod("Speed", "INC", 0.5, ModFlag.Attack, 0, nil), --"attack_speed_+%" = 0.5
-		mod("Speed", "INC", 0.5, ModFlag.Spell), --"base_cast_speed_+%" = 0.5
+		mod("Speed", "INC", 0.5, ModFlag.Cast), --"base_cast_speed_+%" = 0.5
 	},
 	levelMods = {
 		[1] = mod("ProjectileSpeed", "INC", nil), --"base_projectile_speed_+%"
@@ -608,10 +756,14 @@ gems["Faster Projectiles"] = {
 		[30] = { 79, 34, },
 	},
 }
-gems["Fork"] = {
-	dexterity = true,
+skills["SupportFork"] = {
+	name = "Fork",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		projectile = true,
+	},
 	support = true,
-	projectile = true,
 	color = 2,
 	requireSkillTypes = { 3, 54, 56, },
 	addSkillTypes = { },
@@ -659,10 +811,14 @@ gems["Fork"] = {
 		[30] = { -1, },
 	},
 }
-gems["Greater Multiple Projectiles"] = {
-	dexterity = true,
+skills["SupportGreaterMultipleProjectiles"] = {
+	name = "Greater Multiple Projectiles",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		projectile = true,
+	},
 	support = true,
-	projectile = true,
 	color = 2,
 	requireSkillTypes = { 3, 54, 56, },
 	addSkillTypes = { },
@@ -674,7 +830,7 @@ gems["Greater Multiple Projectiles"] = {
 	},
 	qualityMods = {
 		mod("Speed", "INC", 0.5, ModFlag.Attack, 0, nil), --"attack_speed_+%" = 0.5
-		mod("Speed", "INC", 0.5, ModFlag.Spell), --"base_cast_speed_+%" = 0.5
+		mod("Speed", "INC", 0.5, ModFlag.Cast), --"base_cast_speed_+%" = 0.5
 	},
 	levelMods = {
 		[1] = mod("Damage", "MORE", nil, ModFlag.Projectile), --"support_multiple_projectile_damage_+%_final"
@@ -712,9 +868,13 @@ gems["Greater Multiple Projectiles"] = {
 		[30] = { -21, },
 	},
 }
-gems["Hypothermia"] = {
-	cold = true,
-	dexterity = true,
+skills["SupportDamageAgainstChilled"] = {
+	name = "Hypothermia",
+	gemTags = {
+		cold = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 10, 1, },
@@ -722,13 +882,13 @@ gems["Hypothermia"] = {
 	excludeSkillTypes = { },
 	baseMods = {
 		mod("ManaCost", "MORE", 20), 
-		mod("EnemyFreezeChance", "BASE", 10, ModFlag.Hit, 0, { type = "Condition", var = "EnemyChilled" }), --"additional_chance_to_freeze_chilled_enemies_%" = 10
+		mod("EnemyFreezeChance", "BASE", 10, ModFlag.Hit, 0, { type = "EnemyCondition", var = "Chilled" }), --"additional_chance_to_freeze_chilled_enemies_%" = 10
 	},
 	qualityMods = {
 		mod("EnemyChillDuration", "INC", 1.5), --"chill_duration_+%" = 1.5
 	},
 	levelMods = {
-		[1] = mod("Damage", "MORE", nil, ModFlag.Hit, 0, { type = "Condition", var = "EnemyChilled" }), --"support_hypothermia_damage_+%_vs_chilled_enemies_final"
+		[1] = mod("Damage", "MORE", nil, ModFlag.Hit, 0, { type = "EnemyCondition", var = "Chilled" }), --"support_hypothermia_damage_+%_vs_chilled_enemies_final"
 	},
 	levels = {
 		[1] = { 20, },
@@ -763,9 +923,13 @@ gems["Hypothermia"] = {
 		[30] = { 49, },
 	},
 }
-gems["Ice Bite"] = {
-	cold = true,
-	dexterity = true,
+skills["SupportFrenzyChargeOnSlayingFrozenEnemy"] = {
+	name = "Ice Bite",
+	gemTags = {
+		cold = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 10, 1, },
@@ -776,7 +940,7 @@ gems["Ice Bite"] = {
 		mod("EnemyFreezeChance", "BASE", 15), --"base_chance_to_freeze_%" = 15
 	},
 	qualityMods = {
-		mod("Damage", "INC", 1, ModFlag.Hit, 0, { type = "Condition", var = "EnemyFrozen" }), --"damage_+%_vs_frozen_enemies" = 1
+		mod("Damage", "INC", 1, ModFlag.Hit, 0, { type = "EnemyCondition", var = "Frozen" }), --"damage_+%_vs_frozen_enemies" = 1
 	},
 	levelMods = {
 		--[1] = "chance_to_gain_frenzy_charge_on_killing_frozen_enemy_%"
@@ -814,10 +978,14 @@ gems["Ice Bite"] = {
 		[30] = { 79, },
 	},
 }
-gems["Lesser Multiple Projectiles"] = {
-	dexterity = true,
+skills["SupportLesserMultipleProjectiles"] = {
+	name = "Lesser Multiple Projectiles",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		projectile = true,
+	},
 	support = true,
-	projectile = true,
 	color = 2,
 	requireSkillTypes = { 3, 54, 56, },
 	addSkillTypes = { },
@@ -829,7 +997,7 @@ gems["Lesser Multiple Projectiles"] = {
 	},
 	qualityMods = {
 		mod("Speed", "INC", 0.5, ModFlag.Attack, 0, nil), --"attack_speed_+%" = 0.5
-		mod("Speed", "INC", 0.5, ModFlag.Spell), --"base_cast_speed_+%" = 0.5
+		mod("Speed", "INC", 0.5, ModFlag.Cast), --"base_cast_speed_+%" = 0.5
 	},
 	levelMods = {
 		[1] = mod("Damage", "MORE", nil, ModFlag.Projectile), --"support_lesser_multiple_projectile_damage_+%_final"
@@ -867,21 +1035,25 @@ gems["Lesser Multiple Projectiles"] = {
 		[30] = { -11, },
 	},
 }
-gems["Mana Leech"] = {
-	dexterity = true,
+skills["SupportManaLeech"] = {
+	name = "Mana Leech",
+	gemTags = {
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 10, 1, },
 	addSkillTypes = { },
 	excludeSkillTypes = { },
 	baseMods = {
-		--"mana_leech_from_any_damage_permyriad" = 200
+		mod("DamageManaLeech", "BASE", 2), --"mana_leech_from_any_damage_permyriad" = 200
 	},
 	qualityMods = {
-		--"mana_leech_speed_+%" = 0.5
+		mod("ManaLeechRate", "INC", 0.5), --"mana_leech_speed_+%" = 0.5
 	},
 	levelMods = {
-		--[1] = "mana_leech_speed_+%"
+		[1] = mod("ManaLeechRate", "INC", nil), --"mana_leech_speed_+%"
 	},
 	levels = {
 		[1] = { 0, },
@@ -916,10 +1088,14 @@ gems["Mana Leech"] = {
 		[30] = { 58, },
 	},
 }
-gems["Multiple Traps"] = {
-	dexterity = true,
+skills["SupportMultiTrap"] = {
+	name = "Multiple Traps",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		trap = true,
+	},
 	support = true,
-	trap = true,
 	color = 2,
 	requireSkillTypes = { 37, },
 	addSkillTypes = { },
@@ -930,7 +1106,7 @@ gems["Multiple Traps"] = {
 		mod("ActiveTrapLimit", "BASE", 3), --"number_of_additional_traps_allowed" = 3
 	},
 	qualityMods = {
-		mod("TrapTriggerRadius", "INC", 1), --"trap_trigger_radius_+%" = 1
+		mod("TrapTriggerAreaOfEffect", "INC", 1), --"trap_trigger_radius_+%" = 1
 	},
 	levelMods = {
 		[1] = mod("Damage", "MORE", nil), --"support_multithrow_damage_+%_final"
@@ -968,9 +1144,13 @@ gems["Multiple Traps"] = {
 		[30] = { -11, },
 	},
 }
-gems["Physical Projectile Attack Damage"] = {
-	projectile = true,
-	dexterity = true,
+skills["SupportPhysicalProjectileAttackDamage"] = {
+	name = "Physical Projectile Attack Damage",
+	gemTags = {
+		projectile = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 48, 56, },
@@ -1019,10 +1199,14 @@ gems["Physical Projectile Attack Damage"] = {
 		[30] = { 59, },
 	},
 }
-gems["Pierce"] = {
-	dexterity = true,
+skills["SupportPierce"] = {
+	name = "Pierce",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		projectile = true,
+	},
 	support = true,
-	projectile = true,
 	color = 2,
 	requireSkillTypes = { 3, 54, 56, },
 	addSkillTypes = { },
@@ -1070,10 +1254,14 @@ gems["Pierce"] = {
 		[30] = { 24, },
 	},
 }
-gems["Point Blank"] = {
-	projectile = true,
-	attack = true,
-	dexterity = true,
+skills["SupportPointBlank"] = {
+	name = "Point Blank",
+	gemTags = {
+		projectile = true,
+		attack = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 48, 56, },
@@ -1081,7 +1269,7 @@ gems["Point Blank"] = {
 	excludeSkillTypes = { },
 	baseMods = {
 		mod("ManaCost", "MORE", 20), 
-		--"keystone_point_blank" = 1
+		flag("PointBlank"), --"keystone_point_blank" = 1
 	},
 	qualityMods = {
 		mod("Damage", "INC", 0.5, ModFlag.Projectile), --"projectile_damage_+%" = 0.5
@@ -1122,9 +1310,13 @@ gems["Point Blank"] = {
 		[30] = { 58, },
 	},
 }
-gems["Poison"] = {
-	chaos = true,
-	dexterity = true,
+skills["SupportPoison"] = {
+	name = "Poison",
+	gemTags = {
+		chaos = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 10, 1, },
@@ -1173,10 +1365,14 @@ gems["Poison"] = {
 		[30] = { 58, },
 	},
 }
-gems["Rapid Decay"] = {
-	dexterity = true,
+skills["SupportRapidDecay"] = {
+	name = "Rapid Decay",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		duration = true,
+	},
 	support = true,
-	duration = true,
 	color = 2,
 	requireSkillTypes = { 12, 55, },
 	addSkillTypes = { },
@@ -1224,10 +1420,14 @@ gems["Rapid Decay"] = {
 		[30] = { 49, },
 	},
 }
-gems["Slower Projectiles"] = {
-	dexterity = true,
+skills["SupportSlowerProjectiles"] = {
+	name = "Slower Projectiles",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		projectile = true,
+	},
 	support = true,
-	projectile = true,
 	color = 2,
 	requireSkillTypes = { 3, 14, 54, 56, },
 	addSkillTypes = { },
@@ -1275,11 +1475,15 @@ gems["Slower Projectiles"] = {
 		[30] = { -59, 34, },
 	},
 }
-gems["Trap"] = {
-	dexterity = true,
+skills["SupportTrap"] = {
+	name = "Trap",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		trap = true,
+		duration = true,
+	},
 	support = true,
-	trap = true,
-	duration = true,
 	addFlags = {
 		trap = true,
 		duration = true,
@@ -1287,9 +1491,10 @@ gems["Trap"] = {
 	color = 2,
 	requireSkillTypes = { 17, },
 	addSkillTypes = { 12, 37, },
-	excludeSkillTypes = { },
+	excludeSkillTypes = { 61, },
 	baseMods = {
 		mod("ManaCost", "MORE", 40), 
+		skill("cooldown", 4), 
 		--"is_trap" = 1
 		--"base_trap_duration" = 16000
 		--"trap_override_pvp_scaling_time_ms" = 900
@@ -1337,9 +1542,13 @@ gems["Trap"] = {
 		[30] = { 49, },
 	},
 }
-gems["Trap Cooldown"] = {
-	trap = true,
-	dexterity = true,
+skills["SupportTrapCooldown"] = {
+	name = "Trap Cooldown",
+	gemTags = {
+		trap = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 37, },
@@ -1387,11 +1596,15 @@ gems["Trap Cooldown"] = {
 		[30] = { 59, },
 	},
 }
-gems["Trap and Mine Damage"] = {
-	dexterity = true,
+skills["SupportTrapAndMineDamage"] = {
+	name = "Trap and Mine Damage",
+	gemTags = {
+		dexterity = true,
+		support = true,
+		trap = true,
+		mine = true,
+	},
 	support = true,
-	trap = true,
-	mine = true,
 	color = 2,
 	requireSkillTypes = { 37, 41, },
 	addSkillTypes = { },
@@ -1440,9 +1653,13 @@ gems["Trap and Mine Damage"] = {
 		[30] = { 49, },
 	},
 }
-gems["Void Manipulation"] = {
-	chaos = true,
-	dexterity = true,
+skills["SupportVoidManipulation"] = {
+	name = "Void Manipulation",
+	gemTags = {
+		chaos = true,
+		dexterity = true,
+		support = true,
+	},
 	support = true,
 	color = 2,
 	requireSkillTypes = { 10, 1, 40, },

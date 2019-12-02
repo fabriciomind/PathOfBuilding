@@ -27,13 +27,12 @@ local CalcsTabClass = common.NewClass("CalcsTab", "UndoHandler", "ControlHost", 
 
 	self.input = { }
 	self.input.skill_number = 1
-	self.input.skill_activeNumber = 1
-	self.input.skill_part = 1
 	self.input.misc_buffMode = "EFFECTIVE"
 
 	self.colWidth = 230
 	self.sectionList = { }
 
+	-- Special section for skill/mode selection
 	self:NewSection(3, "SkillSelect", 1, "View Skill Details", data.colorCodes.NORMAL, {
 		{ label = "Socket Group", { controlName = "mainSocketGroup", 
 			control = common.New("DropDownControl", nil, 0, 0, 300, 16, nil, function(index) 
@@ -44,18 +43,46 @@ local CalcsTabClass = common.NewClass("CalcsTab", "UndoHandler", "ControlHost", 
 		}, },
 		{ label = "Active Skill", { controlName = "mainSkill", 
 			control = common.New("DropDownControl", nil, 0, 0, 300, 16, nil, function(index)
-				self.input.skill_activeNumber = index
-				self:AddUndoState()
+				local mainSocketGroup = self.build.skillsTab.socketGroupList[self.input.skill_number]
+				mainSocketGroup.mainActiveSkillCalcs = index
 				self.build.buildFlag = true
 			end)
 		}, },
 		{ label = "Skill Part", flag = "multiPart", { controlName = "mainSkillPart", 
-			control = common.New("DropDownControl", nil, 0, 0, 100, 16, nil, function(index)
-				self.input.skill_part = index
+			control = common.New("DropDownControl", nil, 0, 0, 130, 16, nil, function(index)
+				local mainSocketGroup = self.build.skillsTab.socketGroupList[self.input.skill_number]
+				mainSocketGroup.displaySkillListCalcs[mainSocketGroup.mainActiveSkillCalcs].activeGem.srcGem.skillPartCalcs = index
 				self:AddUndoState()
 				self.build.buildFlag = true
 			end)
 		}, },
+		{ label = "Show Minion Stats", flag = "haveMinion", { controlName = "showMinion", 
+			control = common.New("CheckBoxControl", nil, 0, 0, 18, nil, function(state)
+				self.input.showMinion = state
+				self:AddUndoState()
+			end, "Show stats for the minion instead of the player.")
+		}, },
+		{ label = "Minion", flag = "minion", { controlName = "mainSkillMinion",
+			control = common.New("DropDownControl", nil, 0, 0, 150, 16, nil, function(index, val)
+				local mainSocketGroup = self.build.skillsTab.socketGroupList[self.input.skill_number]
+				mainSocketGroup.displaySkillListCalcs[mainSocketGroup.mainActiveSkillCalcs].activeGem.srcGem.skillMinionCalcs = val.val
+				self:AddUndoState()
+				self.build.buildFlag = true
+			end)
+		} },
+		{ label = "Spectre Library", flag = "spectre", { controlName = "mainSkillMinionLibrary",
+			control = common.New("ButtonControl", nil, 0, 0, 100, 16, "Manage Spectres...", function()
+				self.build:OpenSpectreLibrary()
+			end)
+		} },
+		{ label = "Minion Skill", flag = "haveMinion", { controlName = "mainSkillMinionSkill",
+			control = common.New("DropDownControl", nil, 0, 0, 200, 16, nil, function(index)
+				local mainSocketGroup = self.build.skillsTab.socketGroupList[self.input.skill_number]
+				mainSocketGroup.displaySkillListCalcs[mainSocketGroup.mainActiveSkillCalcs].activeGem.srcGem.skillMinionSkillCalcs = index
+				self:AddUndoState()
+				self.build.buildFlag = true
+			end)
+		} },
 		{ label = "Calculation Mode", { 
 			controlName = "mode", 
 			control = common.New("DropDownControl", nil, 0, 0, 100, 16, {
@@ -78,37 +105,14 @@ Effective DPS: Curses and enemy properties (such as resistances and status condi
 		}, },
 		{ label = "Aura and Buff Skills", flag = "buffs", textSize = 12, { format = "{output:BuffList}" }, },
 		{ label = "Combat Buffs", flag = "combat", textSize = 12, { format = "{output:CombatList}" }, },
-		{ label = "Curse Skills", flag = "effective", textSize = 12, { format = "{output:CurseList}" }, },
+		{ label = "Curses and Debuffs", flag = "effective", textSize = 12, { format = "{output:CurseList}" }, },
 	}, function(section)
-		wipeTable(section.controls.mainSocketGroup.list)
-		for i, socketGroup in pairs(self.build.skillsTab.socketGroupList) do
-			section.controls.mainSocketGroup.list[i] = { val = i, label = socketGroup.displayLabel }
-		end
-		if #section.controls.mainSocketGroup.list == 0 then
-			section.controls.mainSocketGroup.list[1] = { val = 1, label = "<No skills added yet>" }
-		else
-			local mainSocketGroup = self.build.skillsTab.socketGroupList[self.input.skill_number]
-			wipeTable(section.controls.mainSkill.list)
-			for i, activeSkill in ipairs(mainSocketGroup.displaySkillList) do
-				t_insert(section.controls.mainSkill.list, { val = i, label = activeSkill.activeGem.name })
-			end
-			section.controls.mainSkill.enabled = #mainSocketGroup.displaySkillList > 1
-			if mainSocketGroup.displaySkillList[1] then
-				local activeGem = mainSocketGroup.displaySkillList[mainSocketGroup.mainActiveSkill].activeGem
-				if activeGem and activeGem.data.parts and #activeGem.data.parts > 1 then
-					section.controls.mainSkillPart.shown = true
-					wipeTable(section.controls.mainSkillPart.list)
-					for i, part in ipairs(activeGem.data.parts) do
-						t_insert(section.controls.mainSkillPart.list, { val = i, label = part.name })
-					end
-					section.controls.mainSkillPart.sel = self.input.skill_part
-				end
-			end
-		end
-		section.controls.mainSocketGroup.sel = self.input.skill_number
+		self.build:RefreshSkillSelectControls(section.controls, self.input.skill_number, "Calcs")
+		section.controls.showMinion.state = self.input.showMinion
 		section.controls.mode:SelByValue(self.input.misc_buffMode)
 	end)
 
+	-- Add sections from the CalcSections module
 	for _, section in ipairs(sectionData) do
 		self:NewSection(unpack(section))
 	end
@@ -180,6 +184,82 @@ function CalcsTabClass:Draw(viewPort, inputEvents)
 	self.width = viewPort.width
 	self.height = viewPort.height
 
+	-- Arrange the sections
+	local baseX = viewPort.x + 4
+	local baseY = viewPort.y + 4
+	local maxCol = m_floor(viewPort.width / (self.colWidth + 8))
+	local colY = { }
+	local maxY = 0
+	for _, section in ipairs(self.sectionList) do
+		section:UpdateSize()
+		if section.enabled then
+			local col
+			if section.group == 1 then
+				-- Group 1: Offense 
+				-- This group is put into the first 3 columns, with each section placed into the highest available location
+				col = 1
+				local minY = colY[col] or baseY
+				for c = 2, 3 do
+					if (colY[c] or baseY) < minY then
+						col = c
+						minY = colY[c] or baseY
+					end
+				end
+			elseif section.group == 2 then
+				-- Group 2: Defense (the first 4 sections)
+				-- This group is put entirely into the 4th column
+				col = 4
+			elseif section.group == 3 then
+				-- Group 3: Defense (the remaining sections)
+				-- This group is put into a 5th column if there's room for one, otherwise they are handled separately
+				if maxCol >= 5 then
+					col = 5
+				end
+			end
+			if col then
+				section.x = baseX + (self.colWidth + 8) * (col - 1)
+				section.y = colY[col] or baseY
+				for c = col, col + section.widthCols - 1 do
+					colY[c] = section.y + section.height + 8
+				end
+				maxY = m_max(maxY, colY[col])
+			end
+		end
+	end
+	if maxCol < 5 then
+		-- There's no room for a 5th column
+		-- Each section from group 3 will instead be placed into column 4 if there's room, otherwise they'll be put in columns 1-3
+		for c = 1, 3 do
+			colY[c] = m_max(colY[1], colY[2], colY[3])
+		end
+		for _, section in ipairs(self.sectionList) do
+			if section.enabled and section.group == 3 then
+				local col = 4
+				if colY[col] + section.height + 4 >= m_max(viewPort.y + viewPort.height, maxY) then
+					-- No room in the 4th column, find the highest available location in columns 1-4
+					local minY = colY[col]
+					for c = 3, 1, -1 do
+						if colY[c] < minY then
+							col = c
+							minY = colY[c]
+						end
+					end
+				end
+				section.x = baseX + (self.colWidth + 8) * (col - 1)
+				section.y = colY[col]
+				colY[col] = section.y + section.height + 8
+				maxY = m_max(maxY, colY[col])
+			end
+		end
+	end
+	self.controls.scrollBar.height = viewPort.height
+	self.controls.scrollBar:SetContentDimension(maxY - baseY, viewPort.height)
+	for _, section in ipairs(self.sectionList) do
+		-- Give sections their actual Y position and let them update
+		section.y = section.y - self.controls.scrollBar.offset
+		section:UpdatePos()
+	end
+
 	for id, event in ipairs(inputEvents) do
 		if event.type == "KeyDown" then
 			if event.key == "z" and IsKeyDown("CTRL") then
@@ -203,71 +283,6 @@ function CalcsTabClass:Draw(viewPort, inputEvents)
 	end
 
 	main:DrawBackground(viewPort)
-
-	local baseX = viewPort.x + 4
-	local baseY = viewPort.y + 4
-	local maxCol = m_floor(viewPort.width / (self.colWidth + 8))
-	local colY = { }
-	local maxY = 0
-	for _, section in ipairs(self.sectionList) do
-		section:UpdateSize()
-		if section.enabled then
-			local col
-			if section.group == 1 then
-				col = 1
-				local minY = colY[col] or baseY
-				for c = 2, 3 do
-					if (colY[c] or baseY) < minY then
-						col = c
-						minY = colY[c] or baseY
-					end
-				end
-			elseif section.group == 2 then
-				col = 4
-			elseif section.group == 3 then
-				if maxCol >= 5 then
-					col = 5
-				end
-			end
-			if col then
-				section.x = baseX + (self.colWidth + 8) * (col - 1)
-				section.y = colY[col] or baseY
-				for c = col, col + section.widthCols - 1 do
-					colY[c] = section.y + section.height + 8
-				end
-				maxY = m_max(maxY, colY[col])
-			end
-		end
-	end
-	if maxCol < 5 then
-		for c = 1, 3 do
-			colY[c] = m_max(colY[1], colY[2], colY[3])--maxY
-		end
-		for _, section in ipairs(self.sectionList) do
-			if section.enabled and section.group == 3 then
-				local col = 4
-				if colY[col] + section.height + 4 >= m_max(viewPort.y + viewPort.height, maxY) then
-					local minY = colY[col]
-					for c = 3, 1, -1 do
-						if colY[c] < minY then
-							col = c
-							minY = colY[c]
-						end
-					end
-				end
-				section.x = baseX + (self.colWidth + 8) * (col - 1)
-				section.y = colY[col]
-				colY[col] = section.y + section.height + 8
-				maxY = m_max(maxY, colY[col])
-			end
-		end
-	end
-	self.controls.scrollBar.height = viewPort.height
-	self.controls.scrollBar:SetContentDimension(maxY - baseY, viewPort.height)
-	for _, section in ipairs(self.sectionList) do
-		section.y = section.y - self.controls.scrollBar.offset
-		section:UpdatePos()
-	end
 
 	if not self.displayPinned then
 		self.displayData = nil
@@ -306,6 +321,37 @@ function CalcsTabClass:SetDisplayStat(displayData, pin)
 	self.controls.breakdown:SetBreakdownData(displayData, pin)
 end
 
+function CalcsTabClass:CheckFlag(obj)
+	local actor = self.input.showMinion and self.calcsEnv.minion or self.calcsEnv.player
+	local skillFlags = actor.mainSkill.skillFlags
+	if obj.flag and not skillFlags[obj.flag] then
+		return
+	end
+	if obj.flagList then
+		for _, flag in ipairs(obj.flagList) do
+			if not skillFlags[flag] then
+				return
+			end
+		end
+	end
+	if obj.notFlag and skillFlags[obj.notFlag] then
+		return
+	end
+	if obj.notFlagList then
+		for _, flag in ipairs(obj.notFlagList) do
+			if skillFlags[flag] then
+				return
+			end
+		end
+	end
+	if obj.haveOutput then
+		if not actor.output[obj.haveOutput] or actor.output[obj.haveOutput] == 0 then
+			return
+		end
+	end
+	return true
+end
+
 -- Build the calculation output tables
 function CalcsTabClass:BuildOutput()
 	self.powerBuildFlag = true
@@ -314,18 +360,16 @@ function CalcsTabClass:BuildOutput()
 	local start = GetTime()
 	SetProfiling(true)
 	for i = 1, 1000  do
-		wipeTable(self.mainOutput)
-		self.calcs.buildOutput(self.build, self.mainOutput, "MAIN")
+		self.calcs.buildOutput(self.build, "MAIN")
 	end
 	SetProfiling(false)
 	ConPrintf("Calc time: %d msec", GetTime() - start)
 	--]]
 
 	self.mainEnv = self.calcs.buildOutput(self.build, "MAIN")
-	self.mainOutput = self.mainEnv.output
-	self.gridEnv = self.calcs.buildOutput(self.build, "GRID")
-	self.gridOutput = self.gridEnv.output
-	self.gridBreakdown = self.gridEnv.breakdown
+	self.mainOutput = self.mainEnv.player.output
+	self.calcsEnv = self.calcs.buildOutput(self.build, "CALCS")
+	self.calcsOutput = self.calcsEnv.player.output
 
 	if self.displayData then
 		self.controls.breakdown:SetBreakdownData()
@@ -334,43 +378,80 @@ function CalcsTabClass:BuildOutput()
 	
 	-- Retrieve calculator functions
 	self.nodeCalculator = { self.calcs.getNodeCalculator(self.build) }
-	self.itemCalculator = { self.calcs.getItemCalculator(self.build) }
+	self.miscCalculator = { self.calcs.getMiscCalculator(self.build) }
+end
+
+-- Controls the coroutine that calculations node power
+function CalcsTabClass:BuildPower()
+	if self.powerBuildFlag then
+		self.powerBuildFlag = false
+		self.powerBuilder = coroutine.create(self.PowerBuilder)
+	end
+	if self.powerBuilder then
+		collectgarbage("stop")
+		local res, errMsg = coroutine.resume(self.powerBuilder, self)
+		if launch.devMode and not res then
+			error(errMsg)
+		end
+		if coroutine.status(self.powerBuilder) == "dead" then
+			self.powerBuilder = nil
+		end
+		collectgarbage("restart")
+	end
 end
 
 -- Estimate the offensive and defensive power of all unallocated nodes
-function CalcsTabClass:BuildPower()
+function CalcsTabClass:PowerBuilder()
 	local calcFunc, calcBase = self:GetNodeCalculator()
 	local cache = { }
-	self.powerMax = { }
+	local newPowerMax = { 
+		dps = 0, 
+		def = 0
+	}
+	if not self.powerMax then
+		self.powerMax = newPowerMax
+	end
+	if coroutine.running() then
+		coroutine.yield()
+	end
+	local start = GetTime()
 	for _, node in pairs(self.build.spec.nodes) do
-		node.power = wipeTable(node.power)
+		wipeTable(node.power)
 		if not node.alloc and node.modKey ~= "" then
 			if not cache[node.modKey] then
 				cache[node.modKey] = calcFunc({node})
 			end
 			local output = cache[node.modKey]
-			node.power.dps = (output.CombinedDPS - calcBase.CombinedDPS) / calcBase.CombinedDPS
-			node.power.def = (output.LifeUnreserved - calcBase.LifeUnreserved) / m_max(3000, calcBase.Life) * 0.5 + 
+			if calcBase.Minion then
+				node.power.dps = (output.Minion.CombinedDPS - calcBase.Minion.CombinedDPS) / calcBase.Minion.CombinedDPS
+			else
+				node.power.dps = (output.CombinedDPS - calcBase.CombinedDPS) / calcBase.CombinedDPS
+			end
+			node.power.def = (output.LifeUnreserved - calcBase.LifeUnreserved) / m_max(3000, calcBase.Life) + 
 							 (output.Armour - calcBase.Armour) / m_max(10000, calcBase.Armour) + 
 							 (output.EnergyShield - calcBase.EnergyShield) / m_max(3000, calcBase.EnergyShield) + 
 							 (output.Evasion - calcBase.Evasion) / m_max(10000, calcBase.Evasion) +
 							 (output.LifeRegen - calcBase.LifeRegen) / 500 +
 							 (output.EnergyShieldRegen - calcBase.EnergyShieldRegen) / 1000
 			if node.path then
-				self.powerMax.dps = m_max(self.powerMax.dps or 0, node.power.dps)
-				self.powerMax.def = m_max(self.powerMax.def or 0, node.power.def)
+				newPowerMax.dps = m_max(newPowerMax.dps, node.power.dps)
+				newPowerMax.def = m_max(newPowerMax.def, node.power.def)
 			end
 		end
-	end
-	self.powerBuildFlag = false
+		if coroutine.running() and GetTime() - start > 100 then
+			coroutine.yield()
+			start = GetTime()
+		end
+	end	
+	self.powerMax = newPowerMax
 end
 
 function CalcsTabClass:GetNodeCalculator()
 	return unpack(self.nodeCalculator)
 end
 
-function CalcsTabClass:GetItemCalculator()
-	return unpack(self.itemCalculator)
+function CalcsTabClass:GetMiscCalculator()
+	return unpack(self.miscCalculator)
 end
 
 function CalcsTabClass:CreateUndoState()

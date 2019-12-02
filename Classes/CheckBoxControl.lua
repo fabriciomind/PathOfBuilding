@@ -5,20 +5,24 @@
 --
 local launch, main = ...
 
-local CheckBoxClass = common.NewClass("CheckBoxControl", "Control", function(self, anchor, x, y, size, label, changeFunc)
+local CheckBoxClass = common.NewClass("CheckBoxControl", "Control", function(self, anchor, x, y, size, label, changeFunc, tooltip)
 	self.Control(anchor, x, y, size, size)
 	self.label = label
 	self.changeFunc = changeFunc
+	self.tooltip = tooltip
+	self.tooltipFunc = function(state)
+		local tooltip = self:GetProperty("tooltip")
+		if tooltip then
+			main:AddTooltipLine(14, tooltip)
+		end
+	end
 end)
 
 function CheckBoxClass:IsMouseOver()
 	if not self:IsShown() then
 		return false
 	end
-	local x, y = self:GetPos()
-	local width, height = self:GetSize()
-	local cursorX, cursorY = GetCursorPos()
-	return cursorX >= x and cursorY >= y and cursorX < x + width and cursorY < y + height
+	return self:IsMouseInBounds()
 end
 
 function CheckBoxClass:Draw(viewPort)
@@ -63,10 +67,10 @@ function CheckBoxClass:Draw(viewPort)
 	if label then
 		DrawString(x - 5, y + 2, "RIGHT_X", size - 4, "VAR", label)
 	end
-	if mOver and self.tooltip then
-		main:AddTooltipLine(16, self:GetProperty("tooltip"))
+	if mOver then
 		SetDrawLayer(nil, 100)
-		main:DrawTooltip(x, y, size, size, viewPort)
+		local col, center = self.tooltipFunc(self.state)
+		main:DrawTooltip(x, y, size, size, viewPort, col, center)
 		SetDrawLayer(nil, 0)
 	end
 end
@@ -88,7 +92,9 @@ function CheckBoxClass:OnKeyUp(key)
 	if key == "LEFTBUTTON" then
 		if self:IsMouseOver() then
 			self.state = not self.state
-			self.changeFunc(self.state)
+			if self.changeFunc then
+				self.changeFunc(self.state)
+			end
 		end
 	end
 	self.clicked = false
